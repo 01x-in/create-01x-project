@@ -310,7 +310,7 @@ Each has a YAML frontmatter block at the top:
 name: agent-name
 description: When Claude Code should use this agent
 tools: Read, Write, Bash, Glob
-model: claude-sonnet-4-5
+model: claude-sonnet-4-6
 ---
 \`\`\`
 

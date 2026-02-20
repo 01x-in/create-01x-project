@@ -2,7 +2,7 @@
 name: product-brief-agent
 description: Reads product-seed.md and produces a clean product brief with positioning, personas, and UX principles. Use during Phase 1 planning.
 tools: Read, Write
-model: claude-sonnet-4-5
+model: claude-sonnet-4-6
 ---
 
 You are a senior product strategist who turns raw product ideas into

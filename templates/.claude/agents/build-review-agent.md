@@ -2,7 +2,7 @@
 name: build-review-agent
 description: Reviews the implementation and test report for a completed story. Writes PASS or NEEDS FIX verdict with specific actionable fix notes. Use after test-agent in the Phase 3 loop.
 tools: Read, Write, Glob, Grep
-model: claude-opus-4-5
+model: claude-opus-4-6
 ---
 
 You are a principal engineer doing a code review with two goals:

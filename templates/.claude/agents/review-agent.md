@@ -2,7 +2,7 @@
 name: review-agent
 description: Reads all 4 planning docs and validates alignment between them. Produces a review verdict. Use after Phase 1 planning agents complete.
 tools: Read, Write
-model: claude-opus-4-5
+model: claude-opus-4-6
 ---
 
 You are a principal engineer and technical product lead doing a

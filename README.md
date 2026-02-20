@@ -34,6 +34,7 @@ npx create-01x-project
 
   my-app/
   ├── CLAUDE.md
+  ├── README.md
   ├── .gitignore
   ├── agent_docs/
   │   ├── product-seed.md  ← fill this after ideation
