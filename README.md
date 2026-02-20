@@ -25,12 +25,13 @@ npx create-01x-project
 
 ```
   ╔══════════════════════════════════════════╗
-  ║   create-01x-project  v1.0.0             ║
+  ║   create-01x-project  v1.1.0             ║
   ║   Claude Code agent system scaffolder    ║
   ╚══════════════════════════════════════════╝
 
   Project name? › my-app
-  Initialise a git repo? › Yes
+
+  The following files will be created:
 
   my-app/
   ├── CLAUDE.md
@@ -53,6 +54,8 @@ npx create-01x-project
           ├── build-review-agent.md
           └── cache-health-agent.md
 
+  Initialise a git repo? › Yes
+
   ✔ Done!
 
   Next steps:
@@ -73,8 +76,8 @@ Two questions. A tree. Done.
 ```
 your-project/
 ├── CLAUDE.md                          ← project operating manual (auto-loaded by Claude Code)
+├── README.md                          ← how-to guide for this project
 ├── .gitignore
-├── README.md
 ├── agent_docs/
 │   ├── product-seed.md                ← fill this after ideation
 │   └── build/                         ← agents write state here during builds
@@ -159,11 +162,22 @@ npx create-01x-project
 
 ```
   Project name? › perishnote
-  Initialise a git repo? › Yes
 
-  ┌─ What will be added to perishnote ─────────────┐
-  │  CLAUDE.md  .gitignore  agent_docs/  .claude/agents/
-  └─────────────────────────────────────────────────┘
+  The following files will be created:
+
+  perishnote/
+  ├── CLAUDE.md
+  ├── README.md
+  ├── .gitignore
+  ├── agent_docs/
+  │   ├── product-seed.md  ← fill this after ideation
+  │   └── build/
+  └── .claude/
+      └── agents/  ← 11 agents
+          ├── orchestrator.md  ← invoke this
+          └── ...
+
+  Initialise a git repo? › Yes
 
   ✔ Done!
 ```
@@ -226,18 +240,12 @@ Run the orchestrator agent.
 ✓ All 4 planning docs complete.
 ```
 
-Two minutes. Your `agent_docs/` folder now has a full technical blueprint,
-a milestone plan, user stories with edge cases, and a product brief.
-
 **Phase 2 — review:**
 
 ```
 ⠸ review-agent    cross-checking all 4 docs...
 
-✓ Review complete → agent_docs/review-notes.md
-
 Verdict: APPROVED
-No critical issues. 2 minor notes logged.
 
 ═══════════════════════════════════════
 ✅ PLANNING COMPLETE — GATE 1
@@ -245,28 +253,19 @@ Type: proceed with scaffold
 ═══════════════════════════════════════
 ```
 
-You open `agent_docs/review-notes.md`. One minor note: the system design
-didn't specify a rate limiting strategy for password attempts. Fixable
-during build. Everything else aligned.
-
 ### 4. Approve Gate 1
 
 ```
 proceed with scaffold
 ```
 
-**Phase 0 — architect agent runs:**
-
 ```
 ⠸ architect-agent    scaffolding repo...
   → next-app initialised
   → packages installed (redis, nanoid, zod, bcrypt)
   → .env.example written
-  → Redis TTL handles expiry natively — no ORM needed
   → CLAUDE.md test commands updated
   → dev server: OK ✓
-
-✓ Scaffold complete → agent_docs/build/scaffold-report.md
 
 ═══════════════════════════════════════
 ✅ SCAFFOLD COMPLETE — GATE 2
@@ -274,43 +273,25 @@ Type: proceed with milestone 1
 ═══════════════════════════════════════
 ```
 
-One item in `agent_docs/build/pending-infra.md` — the Vercel project
-creation command. You run it manually. Everything else is live.
-
 ### 5. Approve Gate 2
 
 ```
 proceed with milestone 1
 ```
 
-**Phase 3 — build loop, story by story:**
-
 ```
 Story STORY-101: Create a list and get a shareable URL
-  ⠸ build-agent          writing tests first... then implementation...
-  ⠸ test-agent           running suite...
-  ⠸ build-review-agent   reviewing code + tests...
   ✓ PASS → committed: [STORY-101] Create list endpoint
 
 Story STORY-102: Access a list with password
-  ⠸ build-agent          writing tests first... then implementation...
-  ⠸ test-agent           running suite...
-  ⠸ build-review-agent   reviewing...
   ✗ NEEDS FIX (cycle 1/3): bcrypt compare called before await
-  ⠸ build-agent          applying fix...
-  ⠸ test-agent           re-running suite...
-  ⠸ build-review-agent   reviewing...
   ✓ PASS → committed: [STORY-102] Password-protected list access
 
 Story STORY-103: Real-time checkbox sync
-  ⠸ build-agent          writing tests first... then implementation...
-  ⠸ test-agent           running suite...
-  ⠸ build-review-agent   reviewing...
   ✓ PASS → committed: [STORY-103] Real-time sync via SSE
 
 ═══════════════════════════════════════
 ✅ MILESTONE 1 COMPLETE — GATE 3
-3 stories completed and committed.
 Type: proceed with milestone 2
 ═══════════════════════════════════════
 ```
@@ -324,24 +305,6 @@ proceed with milestone 1
 proceed with milestone 2
 ```
 
-Four lines. Everything else was agents talking to each other
-through files in `agent_docs/`.
-
----
-
-## Publishing
-
-```bash
-npm login
-npm publish
-```
-
-After publishing:
-
-```bash
-npx create-01x-project
-```
-
 ---
 
 ## Package Structure
@@ -349,7 +312,7 @@ npx create-01x-project
 ```
 create-01x-project/
 ├── bin/
-│   └── create.js               ← CLI entry point — two prompts, copies templates, done
+│   └── create.js               ← CLI entry point
 ├── templates/
 │   └── .claude/
 │       └── agents/             ← all 11 agent .md files
@@ -357,8 +320,14 @@ create-01x-project/
 └── README.md
 ```
 
-No `lib/` folder. No stack definitions. No generators. The tool has one job — copy the agents, create the folder structure, write `CLAUDE.md` and `product-seed.md`. Everything stack-specific is handled by the agents themselves at runtime.
+No `lib/` folder. No stack definitions. No generators. The tool has one job — copy the agents, create the folder structure, write `CLAUDE.md`, `README.md`, and `product-seed.md`. Everything stack-specific is handled by the agents themselves at runtime.
 
 ---
 
-*Part of the 01x Claude Code Agent System — a complete AI-native product development workflow from voice note to shipped code.*
+## About 01x
+
+This tool is part of **[01x](https://01x.in)** — a paid builder environment where you join a cohort, explore an idea, use AI to accelerate, and ship an MVP. If you want to build real products (not just learn concepts) and are serious about using AI as a force multiplier, check it out. Applications are reviewed manually and cohort sizes are kept small by design.
+
+---
+
+*From zero to one to scale.*
