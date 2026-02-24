@@ -119,7 +119,7 @@ Never skip the human gates — they exist for a reason.
 - Product seed:    @agent_docs/product-seed.md
 - System design:   @agent_docs/system-design.md
 - Milestones:      @agent_docs/milestones.md
-- User stories:    @agent_docs/user-stories.md
+- User stories:    agent_docs/user-stories.md
 - Product brief:   @agent_docs/product-brief.md
 - Review notes:    @agent_docs/review-notes.md
 - Build log:       @agent_docs/build/build-log.md

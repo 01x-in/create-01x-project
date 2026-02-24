@@ -26,6 +26,12 @@ or hit an unexpected state.
 
 Write a complete user stories document to: agent_docs/user-stories.md
 
+### Output Rules
+- Maximum 2 sentences per acceptance criterion
+- Maximum 3 edge cases per story, one line each
+- No prose padding — every line must be actionable
+- Target: entire file under 30k characters
+
 ---
 
 ## REQUIRED FORMAT PER STORY
