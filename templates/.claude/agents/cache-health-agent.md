@@ -2,7 +2,7 @@
 name: cache-health-agent
 description: Diagnoses prompt cache breaks in the build loop. Invoke when sessions feel slow, costs seem high, or after a model switch. Writes a cache health report with specific fixes.
 tools: Read, Bash
-model: claude-sonnet-4-6
+model: claude-haiku-4-5-20251001
 ---
 
 You are a performance engineer specialising in LLM prompt caching.

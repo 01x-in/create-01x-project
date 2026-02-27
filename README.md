@@ -6,7 +6,7 @@
 
 ## What It Does
 
-Drops 11 pre-wired Claude Code agents into your project — an orchestrator, four planning agents, a review agent, an architect agent, a TDD build loop, and a cache health monitor. Stack agnostic. Works for any language, framework, or toolchain.
+Drops 12 pre-wired Claude Code agents into your project — an orchestrator, four planning agents, a review agent, an architect agent, a TDD build loop, a cache health monitor, and a PR review agent that fixes bot comments automatically. Stack agnostic. Works for any language, framework, or toolchain.
 
 ```bash
 npx create-01x-project
@@ -25,7 +25,7 @@ npx create-01x-project
 
 ```
   ╔══════════════════════════════════════════╗
-  ║   create-01x-project  v1.1.0             ║
+  ║   create-01x-project  v1.2.0             ║
   ║   Claude Code agent system scaffolder    ║
   ╚══════════════════════════════════════════╝
 
@@ -41,18 +41,21 @@ npx create-01x-project
   │   ├── product-seed.md  ← fill this after ideation
   │   └── build/
   └── .claude/
-      └── agents/  ← 11 agents
-          ├── orchestrator.md  ← invoke this
-          ├── system-design-agent.md
-          ├── milestone-agent.md
-          ├── user-stories-agent.md
-          ├── product-brief-agent.md
-          ├── review-agent.md
-          ├── architect-agent.md
-          ├── build-agent.md
-          ├── test-agent.md
-          ├── build-review-agent.md
-          └── cache-health-agent.md
+      ├── agents/  ← 12 agents
+      │   ├── orchestrator.md  ← invoke this
+      │   ├── system-design-agent.md
+      │   ├── milestone-agent.md
+      │   ├── user-stories-agent.md
+      │   ├── product-brief-agent.md
+      │   ├── review-agent.md
+      │   ├── architect-agent.md
+      │   ├── build-agent.md
+      │   ├── test-agent.md
+      │   ├── build-review-agent.md
+      │   ├── cache-health-agent.md
+      │   └── pr-review-agent.md
+      └── commands/
+          └── fix-pr-review.md
 
   Initialise a git repo? › Yes
 
@@ -82,18 +85,21 @@ your-project/
 │   ├── product-seed.md                ← fill this after ideation
 │   └── build/                         ← agents write state here during builds
 └── .claude/
-    └── agents/
-        ├── orchestrator.md            ← the only agent you ever invoke manually
-        ├── system-design-agent.md     ← Phase 1: technical blueprint
-        ├── milestone-agent.md         ← Phase 1: delivery plan
-        ├── user-stories-agent.md      ← Phase 1: stories + edge cases
-        ├── product-brief-agent.md     ← Phase 1: product positioning
-        ├── review-agent.md            ← Phase 2: cross-doc alignment check
-        ├── architect-agent.md         ← Phase 0: scaffold + install
-        ├── build-agent.md             ← Phase 3: TDD implementation
-        ├── test-agent.md              ← Phase 3: test runner + reporter
-        ├── build-review-agent.md      ← Phase 3: code review + fix notes
-        └── cache-health-agent.md      ← utility: diagnose slow/expensive sessions
+    ├── agents/
+    │   ├── orchestrator.md            ← the only agent you ever invoke manually
+    │   ├── system-design-agent.md     ← Phase 1: technical blueprint
+    │   ├── milestone-agent.md         ← Phase 1: delivery plan
+    │   ├── user-stories-agent.md      ← Phase 1: stories + edge cases
+    │   ├── product-brief-agent.md     ← Phase 1: product positioning
+    │   ├── review-agent.md            ← Phase 2: cross-doc alignment check
+    │   ├── architect-agent.md         ← Phase 0: scaffold + install
+    │   ├── build-agent.md             ← Phase 3: TDD implementation
+    │   ├── test-agent.md              ← Phase 3: test runner + reporter
+    │   ├── build-review-agent.md      ← Phase 3: code review + fix notes
+    │   ├── cache-health-agent.md      ← utility: diagnose slow/expensive sessions
+    │   └── pr-review-agent.md         ← Phase 4: fix PR bot comments automatically
+    └── commands/
+        └── fix-pr-review.md           ← manual trigger: /fix-pr-review
 ```
 
 ---
@@ -128,7 +134,7 @@ Type: proceed with milestone 1
 
 **Step 4 — Build**
 
-The build loop runs story by story — build → test → review → fix — committing as it goes. Milestone gates pause between milestones so you stay in control.
+The build loop runs story by story — build → test → review → fix — committing as it goes. At the end of each milestone, the orchestrator opens a PR and automatically spawns the pr-review-agent to handle any bot review comments before showing the next gate.
 
 Your total keyboard input for a complete build:
 
@@ -173,9 +179,11 @@ npx create-01x-project
   │   ├── product-seed.md  ← fill this after ideation
   │   └── build/
   └── .claude/
-      └── agents/  ← 11 agents
-          ├── orchestrator.md  ← invoke this
-          └── ...
+      ├── agents/  ← 12 agents
+      │   ├── orchestrator.md  ← invoke this
+      │   └── ...
+      └── commands/
+          └── fix-pr-review.md
 
   Initialise a git repo? › Yes
 
@@ -290,8 +298,23 @@ Story STORY-102: Access a list with password
 Story STORY-103: Real-time checkbox sync
   ✓ PASS → committed: [STORY-103] Real-time sync via SSE
 
+⠸ Opening PR for Milestone 1...
+  → gh pr create #4 — "Milestone 1: Core list creation + access"
+
+⠸ pr-review-agent    polling for bot comments...
+  → CodeRabbit reviewed (14s)
+  → 2 actionable comments found
+
+  Fixing:
+    ✓ lib/list.ts:42   [CodeRabbit] missing null check on expiry — fixed in a3f1c2
+    ✓ lib/auth.ts:17   [CodeRabbit] bcrypt rounds hardcoded — moved to env var — fixed in a3f1c2
+  Replied + resolved both threads.
+
+  Tests: PASS  |  Type-check: clean
+
 ═══════════════════════════════════════
 ✅ MILESTONE 1 COMPLETE — GATE 3
+3 stories completed, PR reviewed and clean.
 Type: proceed with milestone 2
 ═══════════════════════════════════════
 ```
@@ -307,20 +330,40 @@ proceed with milestone 2
 
 ---
 
+## The PR Review Agent
+
+After each milestone, the orchestrator opens a PR and spawns `pr-review-agent` automatically. It:
+
+- Polls for comments from Entelligence, CodeRabbit, Codex, or human reviewers
+- Fixes only actionable issues — skips praise, walkthroughs, and outdated threads
+- Replies to each fixed thread with the commit SHA: `"Fixed in a3f1c2 — moved bcrypt rounds to env var"`
+- Resolves the conversation thread via GitHub GraphQL API
+- Verifies tests and type-check pass before pushing
+- Runs up to 3 cycles (each push triggers a re-review from the bots)
+
+If a fix can't be resolved after 3 cycles, it writes to `agent_docs/build/blocked.md` and waits for you.
+
+**Requires:** `gh` CLI authenticated + at least one PR review bot configured on the repo.
+**Manual trigger:** `/fix-pr-review` or `Run the pr-review-agent.`
+
+---
+
 ## Package Structure
 
 ```
 create-01x-project/
 ├── bin/
-│   └── create.js               ← CLI entry point
+│   └── create.js                  ← CLI entry point
 ├── templates/
 │   └── .claude/
-│       └── agents/             ← all 11 agent .md files
+│       ├── agents/                ← all 12 agent .md files
+│       └── commands/
+│           └── fix-pr-review.md   ← manual PR review trigger
 ├── package.json
 └── README.md
 ```
 
-No `lib/` folder. No stack definitions. No generators. The tool has one job — copy the agents, create the folder structure, write `CLAUDE.md`, `README.md`, and `product-seed.md`. Everything stack-specific is handled by the agents themselves at runtime.
+No `lib/` folder. No stack definitions. No generators. The tool has one job — copy the agents and commands, create the folder structure, and write `CLAUDE.md`, `README.md`, and `product-seed.md`. Everything stack-specific is handled by the agents themselves at runtime.
 
 ---
 
