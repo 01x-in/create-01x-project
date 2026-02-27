@@ -10,7 +10,7 @@ const ora = require('ora')
 
 console.log('')
 console.log(kleur.cyan().bold('  ╔══════════════════════════════════════════╗'))
-console.log(kleur.cyan().bold('  ║   create-01x-project  v1.0.0             ║'))
+console.log(kleur.cyan().bold('  ║   create-01x-project  v1.2.0             ║'))
 console.log(kleur.cyan().bold('  ║   Claude Code agent system scaffolder    ║'))
 console.log(kleur.cyan().bold('  ╚══════════════════════════════════════════╝'))
 console.log('')
@@ -48,18 +48,21 @@ async function run() {
   console.log('  ' + kleur.dim('│   ├── ') + kleur.white('product-seed.md') + kleur.dim('  ← fill this after ideation'))
   console.log('  ' + kleur.dim('│   └── ') + kleur.white('build/'))
   console.log('  ' + kleur.dim('└── ') + kleur.yellow('.claude/'))
-  console.log('  ' + kleur.dim('    └── ') + kleur.yellow('agents/') + kleur.dim('  ← 11 agents'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.cyan('orchestrator.md') + kleur.dim('  ← invoke this'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('system-design-agent.md'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('milestone-agent.md'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('user-stories-agent.md'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('product-brief-agent.md'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('review-agent.md'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('architect-agent.md'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('build-agent.md'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('test-agent.md'))
-  console.log('  ' + kleur.dim('        ├── ') + kleur.white('build-review-agent.md'))
-  console.log('  ' + kleur.dim('        └── ') + kleur.white('cache-health-agent.md'))
+  console.log('  ' + kleur.dim('    ├── ') + kleur.yellow('agents/') + kleur.dim('  ← 12 agents'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.cyan('orchestrator.md') + kleur.dim('  ← invoke this'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('system-design-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('milestone-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('user-stories-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('product-brief-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('review-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('architect-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('build-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('test-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('build-review-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('cache-health-agent.md'))
+  console.log('  ' + kleur.dim('    │   └── ') + kleur.dim('pr-review-agent.md'))
+  console.log('  ' + kleur.dim('    └── ') + kleur.yellow('commands/'))
+  console.log('  ' + kleur.dim('        └── ') + kleur.dim('fix-pr-review.md'))
   console.log('')
 
   // ─── Step 2: git question ─────────────────────────────────────────────────
@@ -86,7 +89,7 @@ async function run() {
 
   // ─── Directories ──────────────────────────────────────────────────────────
 
-  const dirs = ['.claude/agents', 'agent_docs/build']
+  const dirs = ['.claude/agents', '.claude/commands', 'agent_docs/build']
   dirs.forEach(d => fs.mkdirSync(path.join(root, d), { recursive: true }))
 
   // ─── Copy all agent templates ─────────────────────────────────────────────
@@ -97,6 +100,16 @@ async function run() {
     fs.copyFileSync(
       path.join(templatesDir, '.claude', 'agents', file),
       path.join(root, '.claude', 'agents', file)
+    )
+  })
+
+  // ─── Copy command templates ───────────────────────────────────────────────
+
+  const commandFiles = fs.readdirSync(path.join(templatesDir, '.claude', 'commands'))
+  commandFiles.forEach(file => {
+    fs.copyFileSync(
+      path.join(templatesDir, '.claude', 'commands', file),
+      path.join(root, '.claude', 'commands', file)
     )
   })
 
@@ -114,6 +127,7 @@ Never skip the human gates — they exist for a reason.
 1. Planning Agents   → produce the 4 spec docs from product-seed.md
 2. Review Agent      → validates all 4 docs for alignment
 3. Build Loop        → build → test → review → fix → repeat per story
+4. PR Review Loop    → opens PR, fixes bot review comments, replies and resolves threads
 
 ## Documentation References
 - Product seed:    @agent_docs/product-seed.md
@@ -148,11 +162,32 @@ Read agent_docs/system-design.md for the full list before writing any code.
 - Lint:        \`[to be filled by architect agent]\`
 - Dev server:  \`[to be filled by architect agent]\`
 
+## Post-PR Review Loop (runs automatically after every milestone PR is opened)
+After opening a milestone PR, spawn the pr-review-agent as a Task subagent.
+It polls for bot comments, fixes actionable issues, replies to each thread
+with the fix commit SHA, resolves the conversation, verifies tests pass,
+then commits and pushes — up to 3 cycles.
+
+Requires: \`gh\` CLI authenticated + at least one PR review bot configured on the repo.
+
+If pr-review-agent writes to agent_docs/build/blocked.md, stop and wait
+for human review before showing the milestone complete gate.
+
+Manual invocation: \`/fix-pr-review\` or \`Run the pr-review-agent.\`
+
 ## Session Management — Cache Rules
 - Use /clear between MILESTONES, not between stories
 - Use /compact at ~70% context capacity, not /clear
 - Never change the tool set or model mid-session
 - Pass state updates via <system-reminder> tags in messages, not file re-reads
+
+## Branch Rules — NEVER COMMIT TO MAIN
+- ALWAYS check \`git branch --show-current\` before starting any milestone work
+- If the current branch is \`main\`, immediately run \`git checkout -b milestone/X\` where X is the current milestone number (e.g., \`git checkout -b milestone/10\` for M8)
+- ALL implementation work (code, tests, doc updates) MUST happen on a \`milestone/X\` branch
+- NEVER commit directly to \`main\` — not even build-log or doc updates
+- After all stories in a milestone pass: push the branch and open a PR to \`main\` with \`gh pr create\`
+- Human gate required between every milestone (wait for PR review/merge before starting next milestone)
 
 ## Build Loop Rules
 - Max 3 fix cycles per story — then escalate to human via blocked.md
@@ -230,8 +265,9 @@ before writing any code:
 ### Step 4 — Build
 
 The build loop runs story by story — build → test → review → fix —
-committing as it goes. You approve each milestone gate before the
-next one starts.
+committing as it goes. At the end of each milestone the orchestrator
+opens a PR and runs the pr-review-agent to fix any bot review comments
+before showing you the next gate.
 
 **Your total keyboard input for a full build:**
 
@@ -256,14 +292,17 @@ ${projectName}/
 │   ├── user-stories.md          ← written by user-stories-agent
 │   ├── product-brief.md         ← written by product-brief-agent
 │   ├── review-notes.md          ← written by review-agent
-│   └── build/
-│       ├── scaffold-report.md   ← written by architect-agent
-│       ├── current-story.md     ← updated per story by orchestrator
-│       ├── build-log.md         ← running commit log
-│       ├── test-report.md       ← written by test-agent each cycle
-│       ├── fix-notes.md         ← written by build-review-agent on failures
-│       ├── blocked.md           ← written when 3 fix cycles exhausted
-│       └── pending-infra.md     ← cloud commands awaiting your execution
+│   ├── build/
+│   │   ├── scaffold-report.md   ← written by architect-agent
+│   │   ├── current-story.md     ← updated per story by orchestrator
+│   │   ├── build-log.md         ← running commit log
+│   │   ├── test-report.md       ← written by test-agent each cycle
+│   │   ├── fix-notes.md         ← written by build-review-agent on failures
+│   │   ├── blocked.md           ← written when 3 fix cycles exhausted
+│   │   ├── pending-infra.md     ← cloud commands awaiting your execution
+│   │   └── pr-review-agent.md   ← runs automatically after a milestone PR is opened
+│   └── commands/
+│       └── fix-pr-review.md.md   ← written by architect-agent
 └── .claude/
     └── agents/                  ← 11 agents, all pre-wired
 \`\`\`
@@ -285,6 +324,7 @@ ${projectName}/
 | test-agent | 3 | Runs test suite and reports results |
 | build-review-agent | 3 | Code review — issues PASS or NEEDS FIX |
 | cache-health-agent | utility | Diagnoses slow or expensive sessions |
+| pr-review-agent | 4 | Fixes PR bot comments, replies, resolves threads |
 
 ---
 
@@ -322,6 +362,19 @@ Changes take effect on the next Claude Code session — no rebuild needed.
 - Tighten the review checklist in \`build-review-agent.md\`
 - Add your preferred test framework commands to \`CLAUDE.md\`
 
+## PR Review Loop
+
+After each milestone, the orchestrator opens a PR and spawns the
+pr-review-agent automatically. It:
+- Polls for comments from Entelligence, CodeRabbit, Codex, or human reviewers
+- Fixes actionable issues (up to 3 cycles)
+- Replies to each thread with the fix commit SHA
+- Resolves the conversation thread via GitHub GraphQL API
+- Verifies tests pass before pushing
+
+**Requires:** \`gh\` CLI authenticated + a PR review bot configured on the repo.
+**Manual invocation:** type \`/fix-pr-review\` or \`Run the pr-review-agent.\`
+
 ---
 
 ## Session Tips
@@ -332,7 +385,7 @@ Changes take effect on the next Claude Code session — no rebuild needed.
 
 ---
 
-*Built with the 01x Claude Code Agent System.*
+*Built by the 01x — [01x.in](https://01x.in)*
 `
   fs.writeFileSync(path.join(root, 'README.md'), projectReadme)
 
@@ -402,8 +455,6 @@ Changes take effect on the next Claude Code session — no rebuild needed.
   }
 
   spinner.succeed('Done!')
-
-  // ─── Next steps ───────────────────────────────────────────────────────────
 
   console.log('')
   console.log(kleur.bold('  Next steps:'))

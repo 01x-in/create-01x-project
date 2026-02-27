@@ -128,6 +128,28 @@ Process each story sequentially using the build loop below.
      - Clear fix-notes.md
      - Move to next story
 
+### After all stories in milestone — open PR and run review loop:
+
+After committing the final story of a milestone:
+
+1. Open a PR for the milestone branch:
+```bash
+gh pr create --title "Milestone [N]: [name]" --body "Closes milestone [N] stories: [list story IDs]"
+```
+
+2. Immediately spawn the pr-review-agent as a background Task:
+```
+Task({
+  subagent_type: "pr-review-agent",
+  prompt: "PR just opened on branch $(git branch --show-current). Run the full review-fix cycle."
+})
+```
+
+3. Wait for pr-review-agent to complete.
+   - If it writes to agent_docs/build/blocked.md → stop, print the block reason,
+     and wait for human to resolve before showing the milestone complete gate.
+   - If it completes cleanly → proceed to the milestone gate message.
+
    If NEEDS FIX:
      - Increment fix counter (track in memory)
      - If counter < 3:
