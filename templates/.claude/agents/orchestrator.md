@@ -40,14 +40,18 @@ Task 4: product-brief-agent
   → reads agent_docs/product-seed.md
   → writes agent_docs/product-brief.md
 
-Wait for all 4 to complete before proceeding.
+Task 5: design-spec-agent
+  → reads agent_docs/product-seed.md
+  → writes agent_docs/design-spec.md
+
+Wait for all 5 to complete before proceeding.
 If any agent fails, report which one and what it wrote (or didn't write).
 
 ---
 
 ## PHASE 2 — REVIEW
 
-After all 4 docs exist, spawn:
+After all 5 docs exist, spawn:
 
 Task: review-agent
   → reads all 4 planning docs
