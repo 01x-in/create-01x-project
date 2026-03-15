@@ -30,6 +30,7 @@ Read these documents fully before doing anything:
 - agent_docs/product-brief.md    → project name, product type
 - agent_docs/system-design.md    → exact tech stack, env vars needed, infra
 - agent_docs/milestones.md       → Milestone 1 scope (only set up what M1 needs)
+- agent_docs/design-spec.md      → design tokens, fonts, and any design packages needed
 
 Let the system design document be your sole guide for stack decisions.
 Do not assume any framework, language, or tooling beyond what is specified there.
@@ -100,7 +101,28 @@ pending-infra.md instead of running it.
 
 ---
 
-## PHASE F — UPDATE CLAUDE.md
+## PHASE F — DESIGN SYSTEM SCAFFOLD
+
+Read agent_docs/design-spec.md sections 2–5 (Color, Typography, Spacing, Shape).
+
+1. Create `src/styles/tokens.css` (or the equivalent for this stack) with all
+   CSS custom properties from design-spec.md sections 2–5 verbatim.
+
+2. If design-spec.md specifies Google Fonts: add the import link or font package.
+   If it specifies a font npm package: install it.
+
+3. Import `tokens.css` into the global stylesheet so tokens are available app-wide.
+
+4. Verify the token file loads with no errors:
+```bash
+# For Next.js: check the build still passes
+npm run build 2>&1 | tail -10
+```
+
+Do NOT create component files — that is build-agent's job.
+Do NOT interpret or adjust the token values — copy them exactly from design-spec.md.
+
+## PHASE G — UPDATE CLAUDE.md
 
 After packages are installed, update the Test Commands section in CLAUDE.md
 with the real commands for this project based on what was just installed.
@@ -122,6 +144,8 @@ COMPLETE / PARTIAL
 - [✓/✗] Packages installed
 - [✓/✗] Environment files
 - [✓/✗] Database schema
+- [✓/✗] Design tokens (src/styles/tokens.css)
+- [✓/✗] Fonts configured
 - [⚠] Cloud infra — see pending-infra.md
 
 ## Commands Awaiting Human Execution

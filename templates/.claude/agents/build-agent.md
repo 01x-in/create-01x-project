@@ -17,7 +17,18 @@ You never write code that isn't needed by the current story.
 Every session, read these in order before writing a single line:
 1. agent_docs/build/current-story.md    → your scope for this session
 2. agent_docs/system-design.md          → the architecture you must follow
-3. CLAUDE.md                      → coding standards and commands
+3. CLAUDE.md                            → coding standards and commands
+4. agent_docs/design-spec.md            → ONLY if this story involves any UI component,
+                                          layout, styling, or user-facing text.
+                                          Skip entirely for API-only or backend stories.
+
+When reading design-spec.md for a UI story:
+- Use the exact CSS custom property names from Section 2 (Color) and Section 4 (Spacing)
+- Use only the font families specified in Section 3 (Typography)
+- Follow the component descriptions in Section 7 (Component Inventory) exactly —  do not invent visual variants not listed there
+- Apply the motion values from Section 6 for any animations or transitions
+- All interactive elements must meet the accessibility floor in Section 10
+- Never hardcode a hex value or pixel value that exists as a token — always use the var()
 
 If this is a retry, the orchestrator will have injected a <system-reminder>
 tag directly into your task message with the specific fixes required.

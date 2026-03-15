@@ -6,7 +6,7 @@
 
 ## What It Does
 
-Drops 12 pre-wired Claude Code agents into your project — an orchestrator, four planning agents, a review agent, an architect agent, a TDD build loop, a cache health monitor, and a PR review agent that fixes bot comments automatically. Stack agnostic. Works for any language, framework, or toolchain.
+Drops 13 pre-wired Claude Code agents into your project — an orchestrator, four planning agents, a review agent, an architect agent, a TDD build loop, a cache health monitor, and a PR review agent that fixes bot comments automatically. Stack agnostic. Works for any language, framework, or toolchain.
 
 ```bash
 npx create-01x-project
@@ -25,7 +25,7 @@ npx create-01x-project
 
 ```
   ╔══════════════════════════════════════════╗
-  ║   create-01x-project  v1.2.0             ║
+  ║   create-01x-project  v1.3.0             ║
   ║   Claude Code agent system scaffolder    ║
   ╚══════════════════════════════════════════╝
 
@@ -41,11 +41,12 @@ npx create-01x-project
   │   ├── product-seed.md  ← fill this after ideation
   │   └── build/
   └── .claude/
-      ├── agents/  ← 12 agents
+      ├── agents/  ← 13 agents
       │   ├── orchestrator.md  ← invoke this
       │   ├── system-design-agent.md
       │   ├── milestone-agent.md
       │   ├── user-stories-agent.md
+      │   ├── design-spec-agent.md
       │   ├── product-brief-agent.md
       │   ├── review-agent.md
       │   ├── architect-agent.md
@@ -90,6 +91,7 @@ your-project/
     │   ├── system-design-agent.md     ← Phase 1: technical blueprint
     │   ├── milestone-agent.md         ← Phase 1: delivery plan
     │   ├── user-stories-agent.md      ← Phase 1: stories + edge cases
+    │   ├── design-spec-agent.md     ← Phase 1: design system + token spec
     │   ├── product-brief-agent.md     ← Phase 1: product positioning
     │   ├── review-agent.md            ← Phase 2: cross-doc alignment check
     │   ├── architect-agent.md         ← Phase 0: scaffold + install
@@ -126,6 +128,7 @@ The orchestrator runs four planning agents in parallel, then a review agent. It 
 
 ```
 ✅ PLANNING COMPLETE — GATE 1
+5 docs approved. Ready to scaffold.
 Type: proceed with scaffold
 
 ✅ SCAFFOLD COMPLETE — GATE 2
@@ -179,7 +182,7 @@ npx create-01x-project
   │   ├── product-seed.md  ← fill this after ideation
   │   └── build/
   └── .claude/
-      ├── agents/  ← 12 agents
+      ├── agents/  ← 13 agents
       │   ├── orchestrator.md  ← invoke this
       │   └── ...
       └── commands/
@@ -257,6 +260,7 @@ Verdict: APPROVED
 
 ═══════════════════════════════════════
 ✅ PLANNING COMPLETE — GATE 1
+5 docs approved. Ready to scaffold.
 Type: proceed with scaffold
 ═══════════════════════════════════════
 ```
