@@ -10,7 +10,7 @@ const ora = require('ora')
 
 console.log('')
 console.log(kleur.cyan().bold('  ╔══════════════════════════════════════════╗'))
-console.log(kleur.cyan().bold('  ║   create-01x-project  v1.3.0             ║'))
+console.log(kleur.cyan().bold('  ║   create-01x-project  v1.3.1             ║'))
 console.log(kleur.cyan().bold('  ║   Claude Code agent system scaffolder    ║'))
 console.log(kleur.cyan().bold('  ╚══════════════════════════════════════════╝'))
 console.log('')
@@ -177,6 +177,13 @@ for human review before showing the milestone complete gate.
 
 Manual invocation: \`/fix-pr-review\` or \`Run the pr-review-agent.\`
 
+## Agent Loop — DO NOT OVERRIDE
+Use ONLY the build loop defined in this file (build-agent → test-agent → build-review-agent).
+Do NOT use superpowers:subagent-driven-development, superpowers:executing-plans, or any
+other external orchestration skill or tool. Those conflict with this project's human-gated
+milestone loop and will bypass the review gates this system depends on.
+The orchestrator is the sole coordinator. Do not spawn agents outside of it.
+
 ## Session Management — Cache Rules
 - Use /clear between MILESTONES, not between stories
 - Use /compact at ~70% context capacity, not /clear
@@ -228,7 +235,7 @@ Open \`agent_docs/product-seed.md\` and describe your product.
 This is the only file you write manually. Be specific — the agents
 read this and produce everything else from it.
 
-### Step 2 — Open in VSCode and run Claude Code
+### Step 2 — Open Claude Code
 
 Open this folder in VSCode. Then open Claude Code and type:
 
