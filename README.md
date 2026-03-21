@@ -6,13 +6,22 @@
 
 ## What It Does
 
-Drops 13 pre-wired Claude Code agents into your project — an orchestrator, four planning agents, a review agent, an architect agent, a TDD build loop, a cache health monitor, and a PR review agent that fixes bot comments automatically. Stack agnostic. Works for any language, framework, or toolchain.
+Drops 14 pre-wired Claude Code agents into your project — an orchestrator, four planning agents, a review agent, an architect agent, a TDD build loop, a cache health monitor, and a PR review agent that fixes bot comments automatically. Stack agnostic. Works for any language, framework, or toolchain.
 
 ```bash
 npx create-01x-project
 ```
 
-That's it. Fill in `agent_docs/product-seed.md`, open Claude Code, and type `Run the orchestrator agent.`
+Fill in `agent_docs/product-seed.md`, open Claude Code, and type `Run the orchestrator agent.`
+
+**Don't have a seed yet?** The seed is the single source of truth the agents build from.
+Generate one before scaffolding — three ways depending on which AI you use:
+
+| Your AI | How to generate the seed |
+|---|---|
+| ChatGPT | [Product Builder GPT](https://chatgpt.com/g/g-69b85a5ce58481919af354b1b8ccdb62-product-builder) — full ideation workspace with web search |
+| Claude | Install [product-seed.skill](https://github.com/01x-in/product-seed-skill) — triggers automatically in any conversation |
+| Any AI | Copy-paste [product-seed-prompt.md](https://github.com/01x-in/product-seed-skill/blob/main/prompt/product-seed-prompt.md) at the start of a new chat |
 
 ---
 
@@ -25,7 +34,7 @@ npx create-01x-project
 
 ```
   ╔══════════════════════════════════════════╗
-  ║   create-01x-project  v1.3.0             ║
+  ║   create-01x-project  v1.4.0             ║
   ║   Claude Code agent system scaffolder    ║
   ╚══════════════════════════════════════════╝
 
@@ -41,7 +50,7 @@ npx create-01x-project
   │   ├── product-seed.md  ← fill this after ideation
   │   └── build/
   └── .claude/
-      ├── agents/  ← 13 agents
+      ├── agents/  ← 14 agents
       │   ├── orchestrator.md  ← invoke this
       │   ├── system-design-agent.md
       │   ├── milestone-agent.md
@@ -54,7 +63,8 @@ npx create-01x-project
       │   ├── test-agent.md
       │   ├── build-review-agent.md
       │   ├── cache-health-agent.md
-      │   └── pr-review-agent.md
+      │   ├── pr-review-agent.md
+      │   └── ui-ux-review-agent.md
       └── commands/
           └── fix-pr-review.md
 
@@ -79,27 +89,29 @@ Two questions. A tree. Done.
 
 ```
 your-project/
-├── CLAUDE.md                          ← project operating manual (auto-loaded by Claude Code)
-├── README.md                          ← how-to guide for this project
+├── CLAUDE.md                           ← project operating manual
+├── doctor.sh                           ← run before starting (checks PinchTab, gh, etc.) (auto-loaded by Claude Code)
+├── README.md                           ← how-to guide for this project
 ├── .gitignore
 ├── agent_docs/
-│   ├── product-seed.md                ← fill this after ideation
-│   └── build/                         ← agents write state here during builds
+│   ├── product-seed.md                 ← fill this after ideation
+│   └── build/                          ← agents write state here during builds
 └── .claude/
     ├── agents/
-    │   ├── orchestrator.md            ← the only agent you ever invoke manually
-    │   ├── system-design-agent.md     ← Phase 1: technical blueprint
-    │   ├── milestone-agent.md         ← Phase 1: delivery plan
-    │   ├── user-stories-agent.md      ← Phase 1: stories + edge cases
-    │   ├── design-spec-agent.md     ← Phase 1: design system + token spec
-    │   ├── product-brief-agent.md     ← Phase 1: product positioning
-    │   ├── review-agent.md            ← Phase 2: cross-doc alignment check
-    │   ├── architect-agent.md         ← Phase 0: scaffold + install
-    │   ├── build-agent.md             ← Phase 3: TDD implementation
-    │   ├── test-agent.md              ← Phase 3: test runner + reporter
-    │   ├── build-review-agent.md      ← Phase 3: code review + fix notes
-    │   ├── cache-health-agent.md      ← utility: diagnose slow/expensive sessions
-    │   └── pr-review-agent.md         ← Phase 4: fix PR bot comments automatically
+    │   ├── orchestrator.md             ← the only agent you ever invoke manually
+    │   ├── architect-agent.md          ← Phase 0: scaffold + install
+    │   ├── system-design-agent.md      ← Phase 1: technical blueprint
+    │   ├── milestone-agent.md          ← Phase 1: delivery plan
+    │   ├── user-stories-agent.md       ← Phase 1: stories + edge cases
+    │   ├── design-spec-agent.md        ← Phase 1: design system + token spec
+    │   ├── product-brief-agent.md      ← Phase 1: product positioning
+    │   ├── review-agent.md             ← Phase 2: cross-doc alignment check
+    │   ├── build-agent.md              ← Phase 3: TDD implementation
+    │   ├── test-agent.md               ← Phase 3: test runner + reporter
+    │   ├── build-review-agent.md       ← Phase 3: code review + fix notes
+    │   ├── ui-ux-review-agent.md       ← Phase 3 gate: validates UI against design-spec
+    │   ├── cache-health-agent.md       ← utility: diagnose slow/expensive sessions
+    │   └── pr-review-agent.md          ← Phase 4: fix PR bot comments automatically
     └── commands/
         └── fix-pr-review.md           ← manual trigger: /fix-pr-review
 ```
@@ -176,13 +188,14 @@ npx create-01x-project
 
   perishnote/
   ├── CLAUDE.md
+  ├── doctor.sh
   ├── README.md
   ├── .gitignore
   ├── agent_docs/
   │   ├── product-seed.md  ← fill this after ideation
   │   └── build/
   └── .claude/
-      ├── agents/  ← 13 agents
+      ├── agents/  ← 14 agents
       │   ├── orchestrator.md  ← invoke this
       │   └── ...
       └── commands/
@@ -368,6 +381,20 @@ create-01x-project/
 ```
 
 No `lib/` folder. No stack definitions. No generators. The tool has one job — copy the agents and commands, create the folder structure, and write `CLAUDE.md`, `README.md`, and `product-seed.md`. Everything stack-specific is handled by the agents themselves at runtime.
+
+---
+
+## The Full Circle
+
+```
+Ideate  → ChatGPT GPT   ──┐
+          Claude Skill  ──┼──▶  product-seed.md  ──▶  npx create-01x-project  ──▶  ship
+          Any AI Prompt ──┘
+```
+
+You think through your idea in whichever AI you prefer. When it's ready, the seed goes into `agent_docs/product-seed.md`. The build system takes it from there — five planning agents, a review gate, scaffold, and a story-by-story build loop that commits as it goes.
+
+→ **[product-seed-skill repo](https://github.com/01x-in/product-seed-skill)** — all three seed generation formats in one place.
 
 ---
 

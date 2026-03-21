@@ -358,6 +358,43 @@ Non-negotiable requirements for every UI component:
 
 ---
 
+## SECTION 11 — UI ASSERTIONS (REQUIRED — do not omit)
+
+After completing all 10 sections above, append a `## UI Assertions` section.
+This section is consumed by `ui-ux-review-agent` for automated structural validation
+of the built frontend. Without it, the UI gate cannot run.
+
+For every route the product has, list the key elements that must be present and
+visible — expressed using ARIA roles and text/label values only. Do not describe
+visual properties (color, spacing, font) — only structural DOM elements.
+
+Format exactly:
+
+```markdown
+## UI Assertions
+
+- route: /[path]
+  dev_server: http://localhost:3000
+  checks:
+    - element with role "[role]" and text "[text]" is visible
+    - element with role "[role]" and label "[label]" is present
+    - element with role "[role]" contains links: [A], [B], [C]
+    - submit with empty [field] shows element with role "alert" containing "[message]"
+```
+
+ARIA roles to use: button, textbox, navigation, heading, alert, link, checkbox,
+combobox, dialog, listbox, menuitem, tab, tabpanel, switch, progressbar.
+
+Rules:
+- Every route in the product must have at least 3 checks
+- Interaction checks (submit, click) are expensive — use for critical error states only
+- Text matching is case-insensitive and substring — keep values short and specific
+- The first route entry must include `dev_server` — subsequent routes may omit it
+- Backend-only products with no frontend routes: write `## UI Assertions` with a
+  comment `# No frontend routes — ui-ux-review-agent will skip automatically`
+
+---
+
 ## RULES
 
 - Every hex value must be a real color decision — not a placeholder.
