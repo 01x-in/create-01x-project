@@ -82,24 +82,26 @@ contains at least one non-loading element.
 ```bash
 curl -s "http://localhost:9867/tabs/{tabId}/snapshot?filter=interactive&format=compact"
 ```
-Parse returned JSON. The `refs` array contains: `id`, `role`, `text`, `label`, `selector`.
+Parse returned JSON. The `nodes` array contains fields such as `ref`, `role`,
+and `name`. Use `name` as the accessible text/label when matching assertions.
 
 ### 2d — Assert each check
 
 **"element with role X and text Y is visible"**
-→ Scan refs: `role == X` AND `text` contains Y (case-insensitive)
+→ Scan nodes: `role == X` AND `name` contains Y (case-insensitive)
 → PASS if found. FAIL with: route, check text, closest match found (if any).
 
 **"element with role X and label Y is present"**
-→ Scan refs: `role == X` AND `label` contains Y
+→ Scan nodes: `role == X` AND `name` contains Y
 → PASS if found. FAIL with details.
 
 **"element with role X contains links: A, B, C"**
-→ Find element with role X, scan child refs with role "link" matching each of A, B, C.
+→ Confirm a node with role X exists, then scan nodes with role "link" whose
+  `name` matches each of A, B, C.
 → PASS if all found. FAIL listing which links are missing.
 
 **"submit with empty name shows element with role X containing Y"** (interaction check)
-→ Find submit button → click it:
+→ Find the submit button node → click it using its `ref`:
 ```bash
 curl -s -X POST http://localhost:9867/tabs/{tabId}/action \
   -H "Content-Type: application/json" \
@@ -186,7 +188,7 @@ Failure report: agent_docs/build/ui-review-failures.md
 
 ## HANDLING ASYNC / DYNAMIC CONTENT
 
-If a snapshot returns empty or loading-only refs:
+If a snapshot returns empty or loading-only nodes:
 - Re-snapshot up to 3 times with 2-second intervals
 - On third attempt still empty → record as FAIL:
   "Page did not render expected content within 6 seconds"
