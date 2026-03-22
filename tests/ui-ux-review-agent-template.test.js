@@ -28,3 +28,12 @@ test('parses snapshot data from PinchTab nodes using documented fields', () => {
   assert.match(template, /Scan nodes: `role == X` AND `name` contains Y/);
   assert.match(template, /click it using its `ref`/);
 });
+
+test('preflights the first asserted route instead of the bare dev server root', () => {
+  assert.match(template, /Extract the `dev_server` URL and the first asserted `route`/);
+  assert.match(template, /curl -s -o \/dev\/null -w "%\{http_code\}" "\{dev_server\}\{route\}"/);
+  assert.doesNotMatch(
+    template,
+    /curl -s -o \/dev\/null -w "%\{http_code\}" http:\/\/localhost:3000/
+  );
+});

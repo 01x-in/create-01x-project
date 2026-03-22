@@ -39,12 +39,15 @@ If section exists but has zero routes → emit PASS with skip report and stop:
 "No UI Assertions defined. Backend-only milestone — skipping UI review."
 
 **Check 3 — Dev server reachable:**
-Extract the `dev_server` URL from the first route entry (default: http://localhost:3000).
+Extract the `dev_server` URL and the first asserted `route` from the first
+route entry (defaults: `http://localhost:3000` and `/`).
+Probe the first asserted route rather than the bare dev server root.
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+curl -s -o /dev/null -w "%{http_code}" "{dev_server}{route}"
 ```
-If not 200 → PREFLIGHT FAIL:
-"Dev server not running at [url]. Start with the dev command from CLAUDE.md."
+If the request does not return a reachable status (2xx or 3xx) → PREFLIGHT FAIL:
+"Dev server route not reachable at [dev_server][route]. Start with the dev
+command from CLAUDE.md or fix the route in UI Assertions."
 
 ---
 
