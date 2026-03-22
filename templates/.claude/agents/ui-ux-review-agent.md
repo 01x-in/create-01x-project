@@ -48,16 +48,16 @@ If not 200 → PREFLIGHT FAIL:
 
 ---
 
-## STEP 1 — LAUNCH PINCHTAB INSTANCE
+## STEP 1 — START PINCHTAB INSTANCE
 
 ```bash
-curl -s -X POST http://localhost:9867/instances/launch \
+curl -s -X POST http://localhost:9867/instances/start \
   -H "Content-Type: application/json" \
   -d '{"name": "ui-review", "mode": "headless"}'
 ```
 
 Store the returned `id` as INSTANCE_ID.
-If launch fails → write PREFLIGHT FAIL and stop.
+If instance start fails → write PREFLIGHT FAIL and stop.
 
 ---
 
