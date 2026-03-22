@@ -132,16 +132,43 @@ Process each story sequentially using the build loop below.
      - Clear fix-notes.md
      - Move to next story
 
-### After all stories in milestone — open PR and run review loop:
+### After all stories in milestone — run UI/UX gate then open PR:
 
-After committing the final story of a milestone:
+After build-review-agent issues PASS on the final story of a milestone:
 
-1. Open a PR for the milestone branch:
+1. Check if `agent_docs/design-spec.md` has a `## UI Assertions` section
+   with at least one route:
+```bash
+grep -q "## UI Assertions" agent_docs/design-spec.md && grep -A5 "## UI Assertions" agent_docs/design-spec.md | grep -q "route:" && echo "has_assertions" || echo "skip"
+```
+
+   If NO UI Assertions → skip ui-ux-review-agent, proceed directly to step 3 (PR creation).
+   If YES UI Assertions → spawn ui-ux-review-agent:
+
+   Task: ui-ux-review-agent
+     → reads agent_docs/design-spec.md UI Assertions
+     → navigates dev server via PinchTab HTTP API
+     → writes PASS to agent_docs/build/ui-review-report.md
+       OR FAIL to agent_docs/build/ui-review-failures.md
+
+   If ui-ux-review-agent emits FAIL:
+     - Read agent_docs/build/ui-review-failures.md
+     - Extract the failures list
+     - Spawn build-agent with <system-reminder>:
+       "UI/UX review failed. Fix before re-running review:
+        [paste failures from report]"
+     - Re-run test-agent and build-review-agent
+     - Re-invoke ui-ux-review-agent
+     - Max 3 ui-review cycles total. If still FAIL after cycle 3:
+       write agent_docs/build/blocked.md, stop, surface to human:
+       "UI/UX review failed after 3 cycles. See ui-review-failures.md"
+
+2. Open a PR for the milestone branch:
 ```bash
 gh pr create --title "Milestone [N]: [name]" --body "Closes milestone [N] stories: [list story IDs]"
 ```
 
-2. Immediately spawn the pr-review-agent as a background Task:
+3. Immediately spawn the pr-review-agent as a background Task:
 ```
 Task({
   subagent_type: "pr-review-agent",

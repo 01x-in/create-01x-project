@@ -10,7 +10,7 @@ const ora = require('ora')
 
 console.log('')
 console.log(kleur.cyan().bold('  ╔══════════════════════════════════════════╗'))
-console.log(kleur.cyan().bold('  ║   create-01x-project  v1.3.1             ║'))
+console.log(kleur.cyan().bold('  ║   create-01x-project  v1.4.0             ║'))
 console.log(kleur.cyan().bold('  ║   Claude Code agent system scaffolder    ║'))
 console.log(kleur.cyan().bold('  ╚══════════════════════════════════════════╝'))
 console.log('')
@@ -42,13 +42,14 @@ async function run() {
   console.log('')
   console.log('  ' + kleur.white(projectName) + '/')
   console.log('  ' + kleur.dim('├── ') + kleur.white('CLAUDE.md'))
+  console.log('  ' + kleur.dim('├── ') + kleur.white('doctor.sh') + kleur.dim('  ← run before starting'))
   console.log('  ' + kleur.dim('├── ') + kleur.white('README.md'))
   console.log('  ' + kleur.dim('├── ') + kleur.white('.gitignore'))
   console.log('  ' + kleur.dim('├── ') + kleur.yellow('agent_docs/'))
   console.log('  ' + kleur.dim('│   ├── ') + kleur.white('product-seed.md') + kleur.dim('  ← fill this after ideation'))
   console.log('  ' + kleur.dim('│   └── ') + kleur.white('build/'))
   console.log('  ' + kleur.dim('└── ') + kleur.yellow('.claude/'))
-  console.log('  ' + kleur.dim('    ├── ') + kleur.yellow('agents/') + kleur.dim('  ← 13 agents'))
+  console.log('  ' + kleur.dim('    ├── ') + kleur.yellow('agents/') + kleur.dim('  ← 14 agents'))
   console.log('  ' + kleur.dim('    │   ├── ') + kleur.cyan('orchestrator.md') + kleur.dim('  ← invoke this'))
   console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('system-design-agent.md'))
   console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('milestone-agent.md'))
@@ -61,6 +62,7 @@ async function run() {
   console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('test-agent.md'))
   console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('build-review-agent.md'))
   console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('cache-health-agent.md'))
+  console.log('  ' + kleur.dim('    │   ├── ') + kleur.dim('ui-ux-review-agent.md'))
   console.log('  ' + kleur.dim('    │   └── ') + kleur.dim('pr-review-agent.md'))
   console.log('  ' + kleur.dim('    └── ') + kleur.yellow('commands/'))
   console.log('  ' + kleur.dim('        └── ') + kleur.dim('fix-pr-review.md'))
@@ -114,6 +116,14 @@ async function run() {
     )
   })
 
+  // ─── Copy doctor.sh ────────────────────────────────────────────────────────
+
+  fs.copyFileSync(
+    path.join(templatesDir, 'doctor.sh'),
+    path.join(root, 'doctor.sh')
+  )
+  fs.chmodSync(path.join(root, 'doctor.sh'), '755')
+
   // ─── CLAUDE.md ────────────────────────────────────────────────────────────
 
   const claudeMd = `# ${projectName} — Project Operating Manual
@@ -128,7 +138,8 @@ Never skip the human gates — they exist for a reason.
 1. Planning Agents   → produce the 5 spec docs from product-seed.md (parallel)
 2. Review Agent      → validates all 5 docs for alignment including design-spec
 3. Build Loop        → build → test → review → fix → repeat per story
-4. PR Review Loop    → opens PR, fixes bot review comments, replies and resolves threads
+4. UI/UX Gate        → validates built frontend against design-spec UI Assertions via PinchTab
+5. PR Review Loop    → opens PR, fixes bot review comments, replies and resolves threads
 
 ## Documentation References
 - Product seed:    @agent_docs/product-seed.md
@@ -139,6 +150,8 @@ Never skip the human gates — they exist for a reason.
 - Product brief:   @agent_docs/product-brief.md
 - Review notes:    @agent_docs/review-notes.md
 - Build log:       @agent_docs/build/build-log.md
+- UI review:       @agent_docs/build/ui-review-report.md
+- UI failures:     @agent_docs/build/ui-review-failures.md
 - Current story:   @agent_docs/build/current-story.md
 - Test report:     @agent_docs/build/test-report.md
 - Fix notes:       @agent_docs/build/fix-notes.md
@@ -163,6 +176,15 @@ Read agent_docs/system-design.md for the full list before writing any code.
 - Type check:  \`[to be filled by architect agent]\`
 - Lint:        \`[to be filled by architect agent]\`
 - Dev server:  \`[to be filled by architect agent]\`
+
+## UI/UX Review Gate (runs after all stories in a milestone pass build-review)
+Requires PinchTab running at localhost:9867 and the dev server running.
+Start PinchTab before milestone completion: \`pinchtab &\`
+Backend-only milestones without UI Assertions in design-spec.md are skipped automatically.
+
+# Environment — UI/UX Review
+# PINCHTAB_URL=http://localhost:9867        (default — change if using Docker)
+# PINCHTAB_NAV_WAIT_MS=2000               (increase for slow dev servers)
 
 ## Post-PR Review Loop (runs automatically after every milestone PR is opened)
 After opening a milestone PR, spawn the pr-review-agent as a Task subagent.
@@ -235,7 +257,7 @@ Open \`agent_docs/product-seed.md\` and describe your product.
 This is the only file you write manually. Be specific — the agents
 read this and produce everything else from it.
 
-### Step 2 — Open Claude Code
+### Step 2 — Open in VSCode and run Claude Code
 
 Open this folder in VSCode. Then open Claude Code and type:
 
@@ -248,7 +270,7 @@ from your open workspace — no imports, no config needed.
 
 ### Step 3 — Approve the gates
 
-The orchestrator runs four planning agents in parallel, then a review
+The orchestrator runs planning agents in parallel, then a review
 agent that cross-checks everything. It stops at two human gates
 before writing any code:
 
