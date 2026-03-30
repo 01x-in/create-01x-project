@@ -1,7 +1,7 @@
 ---
 name: build-agent
 description: Implements a single user story using TDD. Reads current-story.md and fix-notes.md (if retry). Writes tests first, then implementation. Use in the Phase 3 build loop.
-tools: Read, Write, Edit, Bash, Glob, Grep
+tools: Read, Write, Edit, Bash, Glob, Grep, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file
 model: claude-sonnet-4-6
 ---
 
@@ -21,6 +21,9 @@ Every session, read these in order before writing a single line:
 4. agent_docs/design-spec.md            → ONLY if this story involves any UI component,
                                           layout, styling, or user-facing text.
                                           Skip entirely for API-only or backend stories.
+
+If `ctx_*` tools are available, use them for large doc reads or targeted section
+lookups before falling back to standard Claude Code tools.
 
 When reading design-spec.md for a UI story:
 - Use the exact CSS custom property names from Section 2 (Color) and Section 4 (Spacing)

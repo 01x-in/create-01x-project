@@ -34,7 +34,7 @@ npx create-01x-project
 
 ```
   ╔══════════════════════════════════════════╗
-  ║   create-01x-project  v1.4.0             ║
+  ║   create-01x-project  v1.4.1             ║
   ║   Claude Code agent system scaffolder    ║
   ╚══════════════════════════════════════════╝
 
@@ -167,6 +167,8 @@ proceed with milestone 2
 The architect agent reads `agent_docs/system-design.md` — produced by the planning phase — and sets up whatever stack is defined there. It does not assume Next.js, Node, Python, Go, or anything else. If you spec Rust and SQLite in your system design, that's what it installs.
 
 The `CLAUDE.md` that gets created has placeholder test commands that the architect agent fills in after scaffold, based on what it actually installed.
+It references planning docs by path only, so Claude Code reads them on demand instead of auto-loading the whole `agent_docs/` set into memory.
+If the user has the `context-mode` plugin installed, the generated instructions tell agents to prefer `ctx_*` tools for large doc reads and broad analysis, with a clean fallback to normal tools.
 
 ---
 

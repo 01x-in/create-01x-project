@@ -10,7 +10,7 @@ const ora = require('ora')
 
 console.log('')
 console.log(kleur.cyan().bold('  ╔══════════════════════════════════════════╗'))
-console.log(kleur.cyan().bold('  ║   create-01x-project  v1.4.0             ║'))
+console.log(kleur.cyan().bold('  ║   create-01x-project  v1.4.1             ║'))
 console.log(kleur.cyan().bold('  ║   Claude Code agent system scaffolder    ║'))
 console.log(kleur.cyan().bold('  ╚══════════════════════════════════════════╝'))
 console.log('')
@@ -142,21 +142,32 @@ Never skip the human gates — they exist for a reason.
 5. PR Review Loop    → opens PR, fixes bot review comments, replies and resolves threads
 
 ## Documentation References
-- Product seed:    @agent_docs/product-seed.md
-- System design:   @agent_docs/system-design.md
-- Milestones:      @agent_docs/milestones.md
+- Product seed:    agent_docs/product-seed.md
+- System design:   agent_docs/system-design.md
+- Milestones:      agent_docs/milestones.md
 - User stories:    agent_docs/user-stories.md
-- Design spec:     @agent_docs/design-spec.md
-- Product brief:   @agent_docs/product-brief.md
-- Review notes:    @agent_docs/review-notes.md
-- Build log:       @agent_docs/build/build-log.md
-- UI review:       @agent_docs/build/ui-review-report.md
-- UI failures:     @agent_docs/build/ui-review-failures.md
-- Current story:   @agent_docs/build/current-story.md
-- Test report:     @agent_docs/build/test-report.md
-- Fix notes:       @agent_docs/build/fix-notes.md
-- Blocked:         @agent_docs/build/blocked.md
-- Scaffold report: @agent_docs/build/scaffold-report.md
+- Design spec:     agent_docs/design-spec.md
+- Product brief:   agent_docs/product-brief.md
+- Review notes:    agent_docs/review-notes.md
+- Build log:       agent_docs/build/build-log.md
+- UI review:       agent_docs/build/ui-review-report.md
+- UI failures:     agent_docs/build/ui-review-failures.md
+- Current story:   agent_docs/build/current-story.md
+- Test report:     agent_docs/build/test-report.md
+- Fix notes:       agent_docs/build/fix-notes.md
+- Blocked:         agent_docs/build/blocked.md
+- Scaffold report: agent_docs/build/scaffold-report.md
+
+Do not use at-sign-prefixed agent_docs references in this file.
+Open only the specific file you need for the current phase or task so Claude Code
+does not preload the entire planning doc set into memory.
+
+## Optional Context-Mode Support
+If \`ctx_*\` tools are available in the session, prefer them for large doc reads,
+searches, and multi-file analysis so raw output does not flood the main context.
+Use them for planning docs, long logs, big grep results, and broad repo inspection.
+Fallback to the standard Claude Code tools when context-mode is unavailable.
+Do not block work waiting for context-mode to exist.
 
 ## Architecture Decisions — DO NOT OVERRIDE
 These are set during planning. Build agents must respect them.
@@ -201,9 +212,9 @@ Manual invocation: \`/fix-pr-review\` or \`Run the pr-review-agent.\`
 
 ## Agent Loop — DO NOT OVERRIDE
 Use ONLY the build loop defined in this file (build-agent → test-agent → build-review-agent).
-Do NOT use superpowers:subagent-driven-development, superpowers:executing-plans, or any
-other external orchestration skill or tool. Those conflict with this project's human-gated
-milestone loop and will bypass the review gates this system depends on.
+Do NOT use Orba superpowers, ralph-loop, or any other external orchestration skill,
+loop, or tool. That includes external plan runners, autonomous swarm workflows, and
+parallel agent frameworks that bypass this project's built-in gates.
 The orchestrator is the sole coordinator. Do not spawn agents outside of it.
 
 ## Session Management — Cache Rules
