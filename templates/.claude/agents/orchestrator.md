@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: Master coordinator for the entire project pipeline. Invoke this first after dropping product-seed.md. It runs all phases in order with human gates between each.
-tools: Task, Read, Write, Bash
+tools: Task, Read, Write, Bash, mcp__plugin_context-mode_context-mode__ctx_execute
 model: claude-opus-4-6
 ---
 
@@ -17,6 +17,10 @@ subagents and maintain the state files that coordinate between them.
 Before doing anything, verify:
 1. agent_docs/product-seed.md exists → if not, stop and tell the human to drop it in agent_docs/
 2. Read agent_docs/product-seed.md fully to understand the project
+
+If `ctx_*` tools are available, use them for large doc reads, search, and
+multi-file planning analysis. Fall back to standard Claude Code tools when
+they are not available.
 
 ---
 

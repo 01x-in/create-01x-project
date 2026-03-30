@@ -1,7 +1,7 @@
 ---
 name: review-agent
 description: Reads all 4 planning docs and validates alignment between them. Produces a review verdict. Use after Phase 1 planning agents complete.
-tools: Read, Write
+tools: Read, Write, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file
 model: claude-opus-4-6
 ---
 
@@ -25,6 +25,9 @@ Read all four documents in this order:
 5. agent_docs/milestones.md        (delivery plan and story list)
 
 Read every document fully before writing anything.
+If `ctx_*` tools are available, use them to inspect the planning docs and
+cross-check large sections without dumping raw output into the main context.
+Fall back to standard Claude Code tools when context-mode is unavailable.
 
 ---
 
