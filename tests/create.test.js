@@ -5,7 +5,9 @@ const os = require('node:os');
 const path = require('node:path');
 
 const {
+  _internal,
   getPlannedChanges,
+  getPreviewPaths,
   renderHowto,
   renderProjectReadme,
   resolveTargetDirectory,
@@ -25,6 +27,8 @@ test('slugifyProjectName normalizes product names into folder names', () => {
   assert.equal(slugifyProjectName('Perish Note'), 'perish-note');
   assert.equal(slugifyProjectName('  Codex + Gemini  '), 'codex-gemini');
   assert.equal(slugifyProjectName('***'), 'project');
+  assert.equal(slugifyProjectName(null), 'project');
+  assert.equal(slugifyProjectName(undefined), 'project');
 });
 
 test('resolveTargetDirectory keeps scaffolding in the current folder when selected', () => {
@@ -70,6 +74,13 @@ test('getPlannedChanges shows create and overwrite paths for non-empty targets',
   assert.ok(changes.some(change => change.path === 'README.md' && change.status === 'overwrite'));
   assert.ok(changes.some(change => change.path === 'CLAUDE.md' && change.status === 'create'));
   assert.ok(!changes.some(change => change.path === '.gitignore'));
+});
+
+test('preview paths include HOWTO and runtime marker in 01x', () => {
+  const previewPaths = getPreviewPaths('codex', 'Perish Note');
+
+  assert.ok(previewPaths.includes('01x/HOWTO.md'));
+  assert.ok(previewPaths.includes('01x/runtime.json'));
 });
 
 test('writeScaffold writes Claude-only runtime files', () => {
@@ -155,6 +166,12 @@ test('generated HOWTO includes runtime-specific next steps', () => {
   assert.match(codexHowto, /Spawn the orchestrator agent and let it coordinate the workflow\./);
   assert.match(geminiHowto, /Open Gemini CLI in this folder and run:/);
   assert.match(geminiHowto, /\/01x:orchestrator/);
+});
+
+test('codex agent TOML preserves literal backslash sequences', () => {
+  const escaped = _internal.escapeTomlMultiline('literal \\n path');
+
+  assert.equal(escaped, 'literal \\\\n path');
 });
 
 test('runtime-aware doctor template checks codex and gemini outputs', () => {
