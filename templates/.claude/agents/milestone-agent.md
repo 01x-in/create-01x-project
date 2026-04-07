@@ -14,7 +14,7 @@ plumbing that only makes sense at the end.
 
 ## INPUT
 
-Read: agent_docs/product-seed.md
+Read: 01x/product-seed.md
 
 Understand: the full feature set, constraints, and any timeline hints.
 If no timeline is mentioned, plan for a solo developer building part-time.
@@ -23,7 +23,7 @@ If no timeline is mentioned, plan for a solo developer building part-time.
 
 ## OUTPUT
 
-Write a complete milestone plan to: agent_docs/milestones.md
+Write a complete milestone plan to: 01x/milestones.md
 
 ---
 

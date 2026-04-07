@@ -112,7 +112,7 @@ Do NOT hardcode package manager commands — read CLAUDE.md for the real ones.
 
 If either check fails, fix the regression before continuing.
 If you cannot fix a regression introduced by your change, revert your change,
-write the issue to `agent_docs/build/blocked.md`, and stop.
+write the issue to `01x/build/blocked.md`, and stop.
 
 ### Step 7 — Commit and push
 
@@ -180,7 +180,7 @@ that were written to blocked.md.
 
 - If this was **cycle 3**, stop regardless of remaining comments.
 - If the same comment reappears **unchanged** after your fix, stop and write
-  the issue to `agent_docs/build/blocked.md`.
+  the issue to `01x/build/blocked.md`.
 - If there are no more actionable comments, stop — you're done.
 - Otherwise go back to Step 1 for the next cycle.
 
@@ -195,8 +195,8 @@ that were written to blocked.md.
 | No review comments after 3 min polling | Report "no reviews yet" and stop |
 | No actionable comments in this cycle | Report clean and stop |
 | Cycle 3 complete | Stop regardless |
-| Same comment unfixed after 2 attempts | Write to `agent_docs/build/blocked.md` and stop |
-| Test/type-check regression you can't fix | Write to `agent_docs/build/blocked.md` and stop |
+| Same comment unfixed after 2 attempts | Write to `01x/build/blocked.md` and stop |
+| Test/type-check regression you can't fix | Write to `01x/build/blocked.md` and stop |
 
 ---
 

@@ -1,407 +1,253 @@
 # create-01x-project
 
-> Scaffold the Claude Code multi-agent build system into any project. One command, two questions.
-
----
+> Scaffold the 01x multi-agent build system into any project for Claude Code, Codex CLI, or Gemini CLI.
 
 ## What It Does
 
-Drops 14 pre-wired Claude Code agents into your project — an orchestrator, four planning agents, a review agent, an architect agent, a TDD build loop, a cache health monitor, and a PR review agent that fixes bot comments automatically. Stack agnostic. Works for any language, framework, or toolchain.
+`create-01x-project` installs the 01x workflow into a project:
+
+- 14 specialist agents or commands
+- a shared `01x/` planning and build-state system
+- a human-gated workflow for planning, scaffold, build, UI review, and PR review
+- runtime-specific entry files for Claude Code, Codex CLI, or Gemini CLI
 
 ```bash
 npx create-01x-project
 ```
 
-Fill in `agent_docs/product-seed.md`, open Claude Code, and type `Run the orchestrator agent.`
+## CLI Flow
 
-**Don't have a seed yet?** The seed is the single source of truth the agents build from.
-Generate one before scaffolding — three ways depending on which AI you use:
+The generator now asks:
 
-| Your AI | How to generate the seed |
-|---|---|
-| ChatGPT | [Product Builder GPT](https://chatgpt.com/g/g-69b85a5ce58481919af354b1b8ccdb62-product-builder) — full ideation workspace with web search |
-| Claude | Install [product-seed.skill](https://github.com/01x-in/product-seed-skill) — triggers automatically in any conversation |
-| Any AI | Copy-paste [product-seed-prompt.md](https://github.com/01x-in/product-seed-skill/blob/main/prompt/product-seed-prompt.md) at the start of a new chat |
+1. `Which AI coding agent do you use?`
+2. `Project name?`
+3. Whether to scaffold into the current folder or a new folder
+4. `Initialise a git repo?`
 
----
+If the chosen target directory already contains files, the generator shows an explicit create/overwrite preview and asks for confirmation before it writes anything.
 
-## Usage
+## Runtime Support
+
+| Runtime | Root instructions file | Runtime automation output |
+|---|---|---|
+| Claude Code | `CLAUDE.md` | `.claude/agents/*.md`, `.claude/commands/*` |
+| Codex CLI | `AGENTS.md` | `.codex/agents/*.toml`, `.codex/config.toml` |
+| Gemini CLI | `GEMINI.md` | `.gemini/commands/01x/*.toml` |
+
+All three runtimes share the same 01x workflow and `01x/` state files.
+
+## Example: Scaffold in the Current Folder
 
 ```bash
 mkdir my-app && cd my-app
 npx create-01x-project
 ```
 
-```
-  ╔══════════════════════════════════════════╗
-  ║   create-01x-project  v1.4.0             ║
-  ║   Claude Code agent system scaffolder    ║
-  ╚══════════════════════════════════════════╝
+Example prompt flow:
 
-  Project name? › my-app
-
-  The following files will be created:
-
-  my-app/
-  ├── CLAUDE.md
-  ├── README.md
-  ├── .gitignore
-  ├── agent_docs/
-  │   ├── product-seed.md  ← fill this after ideation
-  │   └── build/
-  └── .claude/
-      ├── agents/  ← 14 agents
-      │   ├── orchestrator.md  ← invoke this
-      │   ├── system-design-agent.md
-      │   ├── milestone-agent.md
-      │   ├── user-stories-agent.md
-      │   ├── design-spec-agent.md
-      │   ├── product-brief-agent.md
-      │   ├── review-agent.md
-      │   ├── architect-agent.md
-      │   ├── build-agent.md
-      │   ├── test-agent.md
-      │   ├── build-review-agent.md
-      │   ├── cache-health-agent.md
-      │   ├── pr-review-agent.md
-      │   └── ui-ux-review-agent.md
-      └── commands/
-          └── fix-pr-review.md
-
-  Initialise a git repo? › Yes
-
-  ✔ Done!
-
-  Next steps:
-
-  1.  Fill in agent_docs/product-seed.md
-  2.  Open this folder in VSCode
-  3.  Open Claude Code and type:
-
-       Run the orchestrator agent.
+```text
+Which AI coding agent do you use? › Codex CLI
+Project name? › My App
+Scaffold project files in this folder (my-app)? › Yes
+Initialise a git repo? › Yes
 ```
 
-Two questions. A tree. Done.
-
----
-
-## What Gets Created
-
-```
-your-project/
-├── CLAUDE.md                           ← project operating manual
-├── doctor.sh                           ← run before starting (checks PinchTab, gh, etc.) (auto-loaded by Claude Code)
-├── README.md                           ← how-to guide for this project
-├── .gitignore
-├── agent_docs/
-│   ├── product-seed.md                 ← fill this after ideation
-│   └── build/                          ← agents write state here during builds
-└── .claude/
-    ├── agents/
-    │   ├── orchestrator.md             ← the only agent you ever invoke manually
-    │   ├── architect-agent.md          ← Phase 0: scaffold + install
-    │   ├── system-design-agent.md      ← Phase 1: technical blueprint
-    │   ├── milestone-agent.md          ← Phase 1: delivery plan
-    │   ├── user-stories-agent.md       ← Phase 1: stories + edge cases
-    │   ├── design-spec-agent.md        ← Phase 1: design system + token spec
-    │   ├── product-brief-agent.md      ← Phase 1: product positioning
-    │   ├── review-agent.md             ← Phase 2: cross-doc alignment check
-    │   ├── build-agent.md              ← Phase 3: TDD implementation
-    │   ├── test-agent.md               ← Phase 3: test runner + reporter
-    │   ├── build-review-agent.md       ← Phase 3: code review + fix notes
-    │   ├── ui-ux-review-agent.md       ← Phase 3 gate: validates UI against design-spec
-    │   ├── cache-health-agent.md       ← utility: diagnose slow/expensive sessions
-    │   └── pr-review-agent.md          ← Phase 4: fix PR bot comments automatically
-    └── commands/
-        └── fix-pr-review.md           ← manual trigger: /fix-pr-review
-```
-
----
-
-## The Workflow After Scaffolding
-
-**Step 1 — Fill the seed**
-
-`agent_docs/product-seed.md` is the only file you write manually. Paste in what you built during your ideation session — problem, target user, features, constraints, out of scope. The agents read this and produce everything else.
-
-**Step 2 — Run the orchestrator**
-
-Open the project in VSCode, open Claude Code, type:
-
-```
-Run the orchestrator agent.
-```
-
-Claude Code finds `.claude/agents/orchestrator.md` automatically from your open workspace.
-
-**Step 3 — Approve the gates**
-
-The orchestrator runs four planning agents in parallel, then a review agent. It stops and waits at two human gates before writing any code:
-
-```
-✅ PLANNING COMPLETE — GATE 1
-5 docs approved. Ready to scaffold.
-Type: proceed with scaffold
-
-✅ SCAFFOLD COMPLETE — GATE 2
-Type: proceed with milestone 1
-```
-
-**Step 4 — Build**
-
-The build loop runs story by story — build → test → review → fix — committing as it goes. At the end of each milestone, the orchestrator opens a PR and automatically spawns the pr-review-agent to handle any bot review comments before showing the next gate.
-
-Your total keyboard input for a complete build:
-
-```
-Run the orchestrator agent.
-proceed with scaffold
-proceed with milestone 1
-proceed with milestone 2
-```
-
----
-
-## Stack Agnostic by Design
-
-The architect agent reads `agent_docs/system-design.md` — produced by the planning phase — and sets up whatever stack is defined there. It does not assume Next.js, Node, Python, Go, or anything else. If you spec Rust and SQLite in your system design, that's what it installs.
-
-The `CLAUDE.md` that gets created has placeholder test commands that the architect agent fills in after scaffold, based on what it actually installed.
-
----
-
-## End-to-End Example — PerishNote
-
-Here's a complete walkthrough using a real product idea: a shared, password-protected checklist that self-destructs after 24 hours. No signups.
-
-### 1. Scaffold the project
+## Example: Scaffold into a New Folder
 
 ```bash
-mkdir perishnote && cd perishnote
+mkdir scratch && cd scratch
 npx create-01x-project
 ```
 
-```
-  Project name? › perishnote
+Example prompt flow:
 
-  The following files will be created:
-
-  perishnote/
-  ├── CLAUDE.md
-  ├── doctor.sh
-  ├── README.md
-  ├── .gitignore
-  ├── agent_docs/
-  │   ├── product-seed.md  ← fill this after ideation
-  │   └── build/
-  └── .claude/
-      ├── agents/  ← 14 agents
-      │   ├── orchestrator.md  ← invoke this
-      │   └── ...
-      └── commands/
-          └── fix-pr-review.md
-
-  Initialise a git repo? › Yes
-
-  ✔ Done!
+```text
+Which AI coding agent do you use? › Gemini CLI
+Project name? › PerishNote
+Scaffold project files in the current folder (scratch)? › No
+Folder name? › perishnote
+Initialise a git repo? › Yes
 ```
 
-### 2. Fill in the product seed
+This creates `./perishnote/` and scaffolds the 01x system there.
 
-Open `agent_docs/product-seed.md` and fill it in:
+## What Gets Created
 
-```markdown
-# Product Seed — PerishNote
+Shared files:
 
-## Problem Statement
-Shared checklists built on-the-fly have no lightweight, zero-auth home.
-Existing tools require accounts, persist forever, and feel too heavy
-for transient coordination like a grocery run or a packing list.
-
-## Target User
-Anyone who needs to share a quick checklist with a specific person —
-no technical setup, no account, no friction.
-
-## Core Value Proposition
-A URL-shareable, password-protected checklist that auto-deletes
-after 24 hours. Zero signup required.
-
-## Key Features
-- Create a list, set a password, get a unique shareable URL
-- Checkbox-style items with text labels
-- Real-time sync for anyone with the URL + password
-- Auto-deletion at 24h from creation
-
-## Tech Preferences
-Next.js, Redis for TTL-based auto-expiry, deploy to Vercel
-
-## Constraints
-- Must work on mobile browser
-- No accounts, no email, no cookies
-
-## Out of Scope
-- User history or saved lists
-- File attachments
-- Notifications
+```text
+your-project/
+├── README.md
+├── doctor.sh
+├── .gitignore
+└── 01x/
+    ├── HOWTO.md
+    ├── runtime.json
+    ├── product-seed.md
+    └── build/
+        └── .gitkeep
 ```
+
+Runtime-specific additions:
+
+### Claude Code
+
+```text
+CLAUDE.md
+.claude/
+├── agents/
+│   ├── orchestrator.md
+│   ├── architect-agent.md
+│   ├── build-agent.md
+│   ├── build-review-agent.md
+│   ├── cache-health-agent.md
+│   ├── design-spec-agent.md
+│   ├── milestone-agent.md
+│   ├── pr-review-agent.md
+│   ├── product-brief-agent.md
+│   ├── review-agent.md
+│   ├── system-design-agent.md
+│   ├── test-agent.md
+│   ├── ui-ux-review-agent.md
+│   └── user-stories-agent.md
+└── commands/
+    └── fix-pr-review.md
+```
+
+### Codex CLI
+
+```text
+AGENTS.md
+.codex/
+├── config.toml
+└── agents/
+    ├── orchestrator.toml
+    ├── architect_agent.toml
+    ├── build_agent.toml
+    ├── build_review_agent.toml
+    ├── cache_health_agent.toml
+    ├── design_spec_agent.toml
+    ├── milestone_agent.toml
+    ├── pr_review_agent.toml
+    ├── product_brief_agent.toml
+    ├── review_agent.toml
+    ├── system_design_agent.toml
+    ├── test_agent.toml
+    ├── ui_ux_review_agent.toml
+    └── user_stories_agent.toml
+```
+
+### Gemini CLI
+
+```text
+GEMINI.md
+.gemini/
+└── commands/
+    └── 01x/
+        ├── orchestrator.toml
+        ├── architect-agent.toml
+        ├── build-agent.toml
+        ├── build-review-agent.toml
+        ├── cache-health-agent.toml
+        ├── design-spec-agent.toml
+        ├── fix-pr-review.toml
+        ├── milestone-agent.toml
+        ├── pr-review-agent.toml
+        ├── product-brief-agent.toml
+        ├── review-agent.toml
+        ├── system-design-agent.toml
+        ├── test-agent.toml
+        ├── ui-ux-review-agent.toml
+        └── user-stories-agent.toml
+```
+
+## Workflow After Scaffolding
+
+### 1. Fill the seed
+
+Write `01x/product-seed.md`. This is the only file you author manually before the workflow starts.
+
+### 2. Use the workflow guide
+
+The generated root `README.md` is project-facing and should describe the product.
+The operational instructions live in `01x/HOWTO.md`.
 
 ### 3. Run the orchestrator
 
-Open VSCode with the project. Open Claude Code. Type:
+- Claude Code: `Run the orchestrator agent.`
+- Codex CLI: `Spawn the orchestrator agent and let it coordinate the workflow.`
+- Gemini CLI: `/01x:orchestrator`
 
-```
-Run the orchestrator agent.
-```
+### 4. Approve the human gates
 
-**Phase 1 — four planning agents run in parallel (you watch, you don't type):**
+The workflow stops twice before code generation:
 
-```
-⠸ system-design-agent    writing agent_docs/system-design.md...
-⠸ milestone-agent        writing agent_docs/milestones.md...
-⠸ user-stories-agent     writing agent_docs/user-stories.md...
-⠸ product-brief-agent    writing agent_docs/product-brief.md...
-
-✓ All 4 planning docs complete.
-```
-
-**Phase 2 — review:**
-
-```
-⠸ review-agent    cross-checking all 4 docs...
-
-Verdict: APPROVED
-
-═══════════════════════════════════════
+```text
 ✅ PLANNING COMPLETE — GATE 1
-5 docs approved. Ready to scaffold.
+All 5 docs approved. Ready to scaffold.
 Type: proceed with scaffold
-═══════════════════════════════════════
-```
 
-### 4. Approve Gate 1
-
-```
-proceed with scaffold
-```
-
-```
-⠸ architect-agent    scaffolding repo...
-  → next-app initialised
-  → packages installed (redis, nanoid, zod, bcrypt)
-  → .env.example written
-  → CLAUDE.md test commands updated
-  → dev server: OK ✓
-
-═══════════════════════════════════════
 ✅ SCAFFOLD COMPLETE — GATE 2
+Project is set up and ready to build.
 Type: proceed with milestone 1
-═══════════════════════════════════════
 ```
 
-### 5. Approve Gate 2
+### 5. Build
 
-```
-proceed with milestone 1
-```
+The runtime then uses the same 01x build loop:
 
-```
-Story STORY-101: Create a list and get a shareable URL
-  ✓ PASS → committed: [STORY-101] Create list endpoint
-
-Story STORY-102: Access a list with password
-  ✗ NEEDS FIX (cycle 1/3): bcrypt compare called before await
-  ✓ PASS → committed: [STORY-102] Password-protected list access
-
-Story STORY-103: Real-time checkbox sync
-  ✓ PASS → committed: [STORY-103] Real-time sync via SSE
-
-⠸ Opening PR for Milestone 1...
-  → gh pr create #4 — "Milestone 1: Core list creation + access"
-
-⠸ pr-review-agent    polling for bot comments...
-  → CodeRabbit reviewed (14s)
-  → 2 actionable comments found
-
-  Fixing:
-    ✓ lib/list.ts:42   [CodeRabbit] missing null check on expiry — fixed in a3f1c2
-    ✓ lib/auth.ts:17   [CodeRabbit] bcrypt rounds hardcoded — moved to env var — fixed in a3f1c2
-  Replied + resolved both threads.
-
-  Tests: PASS  |  Type-check: clean
-
-═══════════════════════════════════════
-✅ MILESTONE 1 COMPLETE — GATE 3
-3 stories completed, PR reviewed and clean.
-Type: proceed with milestone 2
-═══════════════════════════════════════
+```text
+build-agent → test-agent → build-review-agent → fix → repeat
 ```
 
-### What you typed across the entire build
+At milestone completion:
 
-```
-Run the orchestrator agent.
-proceed with scaffold
-proceed with milestone 1
-proceed with milestone 2
-```
+- UI/UX review runs if `design-spec.md` defines UI Assertions
+- a milestone PR is opened
+- the PR review loop handles actionable review comments
 
----
+## Runtime Notes
 
-## The PR Review Agent
+### Claude Code
 
-After each milestone, the orchestrator opens a PR and spawns `pr-review-agent` automatically. It:
+- Uses native Claude agent markdown files in `.claude/agents/`
+- Keeps the original `/fix-pr-review` command wrapper
 
-- Polls for comments from Entelligence, CodeRabbit, Codex, or human reviewers
-- Fixes only actionable issues — skips praise, walkthroughs, and outdated threads
-- Replies to each fixed thread with the commit SHA: `"Fixed in a3f1c2 — moved bcrypt rounds to env var"`
-- Resolves the conversation thread via GitHub GraphQL API
-- Verifies tests and type-check pass before pushing
-- Runs up to 3 cycles (each push triggers a re-review from the bots)
+### Codex CLI
 
-If a fix can't be resolved after 3 cycles, it writes to `agent_docs/build/blocked.md` and waits for you.
+- Uses `AGENTS.md` plus project-scoped custom subagents in `.codex/agents/`
+- Adds `.codex/config.toml` to set the project agent fan-out defaults
 
-**Requires:** `gh` CLI authenticated + at least one PR review bot configured on the repo.
-**Manual trigger:** `/fix-pr-review` or `Run the pr-review-agent.`
+### Gemini CLI
 
----
+- Uses `GEMINI.md` plus project-scoped commands in `.gemini/commands/01x/`
+- Keeps the same workflow, but the orchestrator command is written for sequential fallback rather than native subagents
 
-## Package Structure
+## Preflight
 
-```
-create-01x-project/
-├── bin/
-│   └── create.js                  ← CLI entry point
-├── templates/
-│   └── .claude/
-│       ├── agents/                ← all 12 agent .md files
-│       └── commands/
-│           └── fix-pr-review.md   ← manual PR review trigger
-├── package.json
-└── README.md
+Run:
+
+```bash
+bash doctor.sh
 ```
 
-No `lib/` folder. No stack definitions. No generators. The tool has one job — copy the agents and commands, create the folder structure, and write `CLAUDE.md`, `README.md`, and `product-seed.md`. Everything stack-specific is handled by the agents themselves at runtime.
+The script checks:
 
----
+- core tools like Node.js, git, and `gh`
+- runtime-specific files from `01x/runtime.json`
+- the relevant runtime binary (`codex` or `gemini` where applicable)
+- PinchTab and browser prerequisites for the UI review gate
 
-## The Full Circle
+## Development Notes
 
+This repository now generates runtime-specific output from one shared prompt corpus:
+
+- Claude markdown templates in `templates/.claude/agents/` remain the canonical shared source
+- Codex `.toml` agents are rendered from those templates with Codex-specific wrappers
+- Gemini `.toml` commands are rendered from the same shared bodies with Gemini-specific wrappers
+
+## Testing
+
+```bash
+npm test
 ```
-Ideate  → ChatGPT GPT   ──┐
-          Claude Skill  ──┼──▶  product-seed.md  ──▶  npx create-01x-project  ──▶  ship
-          Any AI Prompt ──┘
-```
-
-You think through your idea in whichever AI you prefer. When it's ready, the seed goes into `agent_docs/product-seed.md`. The build system takes it from there — five planning agents, a review gate, scaffold, and a story-by-story build loop that commits as it goes.
-
-→ **[product-seed-skill repo](https://github.com/01x-in/product-seed-skill)** — all three seed generation formats in one place.
-
----
-
-## About 01x
-
-This tool is part of **[01x](https://01x.in)** — a paid builder environment where you join a cohort, explore an idea, use AI to accelerate, and ship an MVP. If you want to build real products (not just learn concepts) and are serious about using AI as a force multiplier, check it out. Applications are reviewed manually and cohort sizes are kept small by design.
-
----
-
-*From zero to one to scale.*

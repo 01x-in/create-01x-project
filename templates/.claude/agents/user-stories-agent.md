@@ -14,7 +14,7 @@ cases, failure states, and the things users will accidentally do wrong.
 
 ## INPUT
 
-Read: agent_docs/product-seed.md
+Read: 01x/product-seed.md
 
 Think about every type of user who might touch this product.
 Think about every way someone could use it wrong, rush through it,
@@ -24,7 +24,7 @@ or hit an unexpected state.
 
 ## OUTPUT
 
-Write a complete user stories document to: agent_docs/user-stories.md
+Write a complete user stories document to: 01x/user-stories.md
 
 ### Output Rules
 - Maximum 2 sentences per acceptance criterion

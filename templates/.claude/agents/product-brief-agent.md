@@ -14,7 +14,7 @@ opinionated, and human-readable — not corporate fluff.
 
 ## INPUT
 
-Read: agent_docs/product-seed.md
+Read: 01x/product-seed.md
 
 Extract the core product intention, even if it was expressed casually.
 Identify what problem is really being solved and for whom.
@@ -23,7 +23,7 @@ Identify what problem is really being solved and for whom.
 
 ## OUTPUT
 
-Write a complete product brief to: agent_docs/product-brief.md
+Write a complete product brief to: 01x/product-brief.md
 
 ---
 
