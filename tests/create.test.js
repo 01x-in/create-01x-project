@@ -93,11 +93,15 @@ test('writeScaffold writes Claude-only runtime files', () => {
     targetDirectoryMode: 'current',
   });
 
+  const orchestratorTemplate = readFile(path.join(targetDir, '.claude', 'agents', 'orchestrator.md'));
+
   assert.ok(fs.existsSync(path.join(targetDir, 'CLAUDE.md')));
   assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'orchestrator.md')));
   assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'commands', 'fix-pr-review.md')));
   assert.ok(fs.existsSync(path.join(targetDir, '01x', 'runtime.json')));
   assert.ok(fs.existsSync(path.join(targetDir, '01x', 'HOWTO.md')));
+  assert.match(orchestratorTemplate, /^model: claude-opus-4-6$/m);
+  assert.match(orchestratorTemplate, /^tools: Task, Read, Write, Bash$/m);
   assert.ok(!fs.existsSync(path.join(targetDir, 'AGENTS.md')));
   assert.ok(!fs.existsSync(path.join(targetDir, 'GEMINI.md')));
 });
@@ -117,8 +121,10 @@ test('writeScaffold writes Codex-only runtime files with TOML agents', () => {
 
   assert.ok(fs.existsSync(path.join(targetDir, 'AGENTS.md')));
   assert.ok(fs.existsSync(path.join(targetDir, '.codex', 'config.toml')));
+  assert.match(orchestratorToml, /model = "gpt-5.4"/);
   assert.match(orchestratorToml, /developer_instructions = """/);
   assert.match(orchestratorToml, /All 5 docs approved/);
+  assert.doesNotMatch(orchestratorToml, /claude-(opus|sonnet|haiku)/);
   assert.match(reviewToml, /reads all 5 planning docs/i);
   assert.ok(!fs.existsSync(path.join(targetDir, 'CLAUDE.md')));
   assert.ok(!fs.existsSync(path.join(targetDir, 'GEMINI.md')));
@@ -166,6 +172,13 @@ test('generated HOWTO includes runtime-specific next steps', () => {
   assert.match(codexHowto, /Spawn the orchestrator agent and let it coordinate the workflow\./);
   assert.match(geminiHowto, /Open Gemini CLI in this folder and run:/);
   assert.match(geminiHowto, /\/01x:orchestrator/);
+});
+
+test('shared agent templates are runtime-neutral prompt sources', () => {
+  const sharedOrchestrator = readFile(path.join(__dirname, '..', 'templates', 'agents-shared', 'orchestrator.md'));
+
+  assert.doesNotMatch(sharedOrchestrator, /^model:/m);
+  assert.doesNotMatch(sharedOrchestrator, /^tools:/m);
 });
 
 test('codex agent TOML preserves literal backslash sequences', () => {

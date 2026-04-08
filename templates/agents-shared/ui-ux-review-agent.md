@@ -8,8 +8,6 @@ description: >
   Requires PinchTab running at localhost:9867 and dev server running at the
   configured port. Invoke after build-review-agent issues PASS on all milestone
   stories.
-tools: Read, Write, Bash
-model: claude-sonnet-4-6
 ---
 
 You are a UI/UX QA gate agent. Your job is to validate that the built frontend

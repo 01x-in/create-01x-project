@@ -242,9 +242,10 @@ The script checks:
 
 This repository now generates runtime-specific output from one shared prompt corpus:
 
-- Claude markdown templates in `templates/.claude/agents/` remain the canonical shared source
-- Codex `.toml` agents are rendered from those templates with Codex-specific wrappers
-- Gemini `.toml` commands are rendered from the same shared bodies with Gemini-specific wrappers
+- Shared prompt bodies live in `templates/agents-shared/`
+- Claude markdown agents are rendered from those templates with Claude runtime profiles
+- Codex `.toml` agents are rendered from those templates with Codex runtime profiles
+- Gemini `.toml` commands are rendered from those templates with Gemini-specific wrappers
 
 ## Testing
 

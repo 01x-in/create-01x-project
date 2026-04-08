@@ -7,8 +7,7 @@ const templatePath = path.join(
   __dirname,
   '..',
   'templates',
-  '.claude',
-  'agents',
+  'agents-shared',
   'ui-ux-review-agent.md'
 );
 
