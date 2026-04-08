@@ -20,11 +20,21 @@ const {
 } = require('../lib/scaffold')
 
 function printBanner() {
+  const mark = [
+    '  ___  ___  __',
+    ' / _ \\| \\ \\/ /',
+    '| | | | |\\  / ',
+    '| |_| | |/  \\ ',
+    ' \\___/|_/_/\\_\\',
+  ]
+
   console.log('')
-  console.log(kleur.cyan().bold('  ╔══════════════════════════════════════════╗'))
-  console.log(kleur.cyan().bold(`  ║   create-01x-project  v${VERSION.padEnd(5)}           ║`))
-  console.log(kleur.cyan().bold('  ║   AI coding agent system scaffolder     ║'))
-  console.log(kleur.cyan().bold('  ╚══════════════════════════════════════════╝'))
+  for (const line of mark) {
+    console.log('  ' + kleur.green(line))
+  }
+  console.log('')
+  console.log('  ' + kleur.white().bold(`create-01x-project v${VERSION}`))
+  console.log('  ' + kleur.green().dim('AI coding agent system scaffolder'))
   console.log('')
 }
 
