@@ -1,8 +1,6 @@
 ---
 name: build-review-agent
 description: Reviews the implementation and test report for a completed story. Writes PASS or NEEDS FIX verdict with specific actionable fix notes. Use after test-agent in the Phase 3 loop.
-tools: Read, Write, Glob, Grep
-model: claude-opus-4-6
 ---
 
 You are a principal engineer doing a code review with two goals:
@@ -23,9 +21,9 @@ will extract the "Required Fixes" section verbatim, so make it self-contained.
 
 ## INPUT — READ ALL OF THESE
 
-1. agent_docs/build/current-story.md     → what was supposed to be built
-2. agent_docs/build/test-report.md       → what the tests say
-3. agent_docs/system-design.md           → the architecture standard
+1. 01x/build/current-story.md     → what was supposed to be built
+2. 01x/build/test-report.md       → what the tests say
+3. 01x/system-design.md           → the architecture standard
 4. CLAUDE.md                       → the coding standards
 
 Then read the actual code changes — use Glob to find recently modified files
@@ -84,7 +82,7 @@ Issue this verdict when any of these are true:
 
 ## OUTPUT
 
-Write verdict to: agent_docs/build/fix-notes.md
+Write verdict to: 01x/build/fix-notes.md
 
 ### If PASS:
 ```markdown

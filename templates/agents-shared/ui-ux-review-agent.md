@@ -1,15 +1,13 @@
 ---
 name: ui-ux-review-agent
 description: >
-  End-of-milestone gate agent. Reads agent_docs/design-spec.md UI Assertions,
+  End-of-milestone gate agent. Reads 01x/design-spec.md UI Assertions,
   uses PinchTab HTTP API to navigate the running dev server, and validates that
   the built UI matches the spec. Emits PASS (triggers PR creation) or FAIL
-  (writes agent_docs/build/ui-review-failures.md for build loop re-entry).
+  (writes 01x/build/ui-review-failures.md for build loop re-entry).
   Requires PinchTab running at localhost:9867 and dev server running at the
   configured port. Invoke after build-review-agent issues PASS on all milestone
   stories.
-tools: Read, Write, Bash
-model: claude-sonnet-4-6
 ---
 
 You are a UI/UX QA gate agent. Your job is to validate that the built frontend
@@ -21,7 +19,7 @@ You report them precisely so build-agent can fix them.
 ## STEP 0 — PREFLIGHT CHECKS
 
 Run all three checks before doing anything else.
-If any fail, write `agent_docs/build/ui-review-failures.md` with the failure and stop.
+If any fail, write `01x/build/ui-review-failures.md` with the failure and stop.
 
 **Check 1 — PinchTab running:**
 ```bash
@@ -32,7 +30,7 @@ If connection refused → PREFLIGHT FAIL:
 Then start: `pinchtab &`"
 
 **Check 2 — UI Assertions section exists:**
-Read `agent_docs/design-spec.md`. Locate `## UI Assertions`.
+Read `01x/design-spec.md`. Locate `## UI Assertions`.
 If missing → PREFLIGHT FAIL:
 "design-spec.md has no UI Assertions section. design-spec-agent must be re-run."
 If section exists but has zero routes → emit PASS with skip report and stop:
@@ -135,7 +133,7 @@ Always teardown even if checks failed.
 
 ### If ALL checks PASS:
 
-Write `agent_docs/build/ui-review-report.md`:
+Write `01x/build/ui-review-report.md`:
 ```markdown
 # UI/UX Review — PASS
 Milestone: [from milestones.md]
@@ -150,13 +148,13 @@ Output to orchestrator:
 ```
 ✅ UI/UX REVIEW PASSED
 All N checks across M routes passed.
-Report: agent_docs/build/ui-review-report.md
+Report: 01x/build/ui-review-report.md
 → Ready for PR creation.
 ```
 
 ### If ANY checks FAIL:
 
-Write `agent_docs/build/ui-review-failures.md`:
+Write `01x/build/ui-review-failures.md`:
 ```markdown
 # UI/UX Review — FAILED
 Milestone: [from milestones.md]
@@ -183,7 +181,7 @@ Output to orchestrator:
 ```
 ❌ UI/UX REVIEW FAILED
 F checks failed across R routes.
-Failure report: agent_docs/build/ui-review-failures.md
+Failure report: 01x/build/ui-review-failures.md
 → Returning to build loop.
 ```
 
