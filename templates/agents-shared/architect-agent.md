@@ -120,10 +120,19 @@ npm run build 2>&1 | tail -10
 Do NOT create component files — that is build-agent's job.
 Do NOT interpret or adjust the token values — copy them exactly from design-spec.md.
 
-## PHASE G — UPDATE CLAUDE.md
+## PHASE G — UPDATE OPERATING MANUAL AND README
 
 After packages are installed, update the Test Commands section in CLAUDE.md
 with the real commands for this project based on what was just installed.
+
+If README.md already exists, refresh or add a short Development section with:
+- install command
+- dev server command
+- test command
+- build command
+
+Preserve the product-facing overview.
+Do not turn README.md into an 01x workflow manual.
 
 ---
 

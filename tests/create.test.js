@@ -94,14 +94,18 @@ test('writeScaffold writes Claude-only runtime files', () => {
   });
 
   const orchestratorTemplate = readFile(path.join(targetDir, '.claude', 'agents', 'orchestrator.md'));
+  const readmeAgentTemplate = readFile(path.join(targetDir, '.claude', 'agents', 'readme-agent.md'));
 
   assert.ok(fs.existsSync(path.join(targetDir, 'CLAUDE.md')));
   assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'orchestrator.md')));
+  assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'readme-agent.md')));
   assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'commands', 'fix-pr-review.md')));
   assert.ok(fs.existsSync(path.join(targetDir, '01x', 'runtime.json')));
   assert.ok(fs.existsSync(path.join(targetDir, '01x', 'HOWTO.md')));
   assert.match(orchestratorTemplate, /^model: claude-opus-4-6$/m);
+  assert.match(orchestratorTemplate, /Spawn: readme-agent/);
   assert.match(orchestratorTemplate, /^tools: Task, Read, Write, Bash$/m);
+  assert.match(readmeAgentTemplate, /Write the root `README\.md`/);
   assert.ok(!fs.existsSync(path.join(targetDir, 'AGENTS.md')));
   assert.ok(!fs.existsSync(path.join(targetDir, 'GEMINI.md')));
 });
@@ -118,14 +122,17 @@ test('writeScaffold writes Codex-only runtime files with TOML agents', () => {
 
   const orchestratorToml = readFile(path.join(targetDir, '.codex', 'agents', 'orchestrator.toml'));
   const reviewToml = readFile(path.join(targetDir, '.codex', 'agents', 'review_agent.toml'));
+  const readmeAgentToml = readFile(path.join(targetDir, '.codex', 'agents', 'readme_agent.toml'));
 
   assert.ok(fs.existsSync(path.join(targetDir, 'AGENTS.md')));
   assert.ok(fs.existsSync(path.join(targetDir, '.codex', 'config.toml')));
   assert.match(orchestratorToml, /model = "gpt-5.4"/);
   assert.match(orchestratorToml, /developer_instructions = """/);
   assert.match(orchestratorToml, /All 5 docs approved/);
+  assert.match(orchestratorToml, /Spawn readme_agent/);
   assert.doesNotMatch(orchestratorToml, /claude-(opus|sonnet|haiku)/);
   assert.match(reviewToml, /reads all 5 planning docs/i);
+  assert.match(readmeAgentToml, /Write the root `README\.md`/);
   assert.ok(!fs.existsSync(path.join(targetDir, 'CLAUDE.md')));
   assert.ok(!fs.existsSync(path.join(targetDir, 'GEMINI.md')));
   assert.ok(!fs.existsSync(path.join(targetDir, '.claude')));
@@ -143,12 +150,15 @@ test('writeScaffold writes Gemini-only runtime files with command TOML', () => {
 
   const orchestratorToml = readFile(path.join(targetDir, '.gemini', 'commands', '01x', 'orchestrator.toml'));
   const fixPrReviewToml = readFile(path.join(targetDir, '.gemini', 'commands', '01x', 'fix-pr-review.toml'));
+  const readmeAgentToml = readFile(path.join(targetDir, '.gemini', 'commands', '01x', 'readme-agent.toml'));
   const runtimeMarker = JSON.parse(readFile(path.join(targetDir, '01x', 'runtime.json')));
 
   assert.ok(fs.existsSync(path.join(targetDir, 'GEMINI.md')));
   assert.match(orchestratorToml, /prompt = """/);
   assert.match(orchestratorToml, /All 5 docs approved/);
+  assert.match(orchestratorToml, /Execute the readme-agent role/);
   assert.match(fixPrReviewToml, /PR review loop/);
+  assert.match(readmeAgentToml, /Write the root `README\.md`/);
   assert.equal(runtimeMarker.runtime, 'gemini');
   assert.equal(runtimeMarker.targetDirectoryMode, 'custom');
   assert.ok(!fs.existsSync(path.join(targetDir, 'CLAUDE.md')));
@@ -159,7 +169,8 @@ test('writeScaffold writes Gemini-only runtime files with command TOML', () => {
 test('generated README stays project-facing and points workflow docs to HOWTO', () => {
   const codexReadme = renderProjectReadme('Perish Note', 'codex');
 
-  assert.match(codexReadme, /This README should describe the product itself\./);
+  assert.match(codexReadme, /Starter README\./);
+  assert.match(codexReadme, /readme-agent will replace this with project-specific content/);
   assert.match(codexReadme, /The operational workflow lives in `01x\/HOWTO\.md`\./);
   assert.match(codexReadme, /Planning Source of Truth/);
 });
@@ -169,6 +180,8 @@ test('generated HOWTO includes runtime-specific next steps', () => {
   const geminiHowto = renderHowto('Perish Note', 'gemini');
 
   assert.match(codexHowto, /Open Codex CLI in this folder and type:/);
+  assert.match(codexHowto, /refreshes `README\.md`/);
+  assert.match(codexHowto, /\| readme-agent \| post-review \| Rewrites the root README\.md/);
   assert.match(codexHowto, /Spawn the orchestrator agent and let it coordinate the workflow\./);
   assert.match(geminiHowto, /Open Gemini CLI in this folder and run:/);
   assert.match(geminiHowto, /\/01x:orchestrator/);

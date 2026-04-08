@@ -169,7 +169,8 @@ Write `01x/product-seed.md`. This is the only file you author manually before th
 
 ### 2. Use the workflow guide
 
-The generated root `README.md` is project-facing and should describe the product.
+The generated root `README.md` starts as a stub and is then rewritten by `readme-agent`
+from the approved planning docs so it describes the product.
 The operational instructions live in `01x/HOWTO.md`.
 
 ### 3. Run the orchestrator

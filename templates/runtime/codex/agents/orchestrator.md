@@ -32,6 +32,10 @@ If the verdict is NEEDS REVISION:
 - Stop and wait for direction.
 
 If the verdict is APPROVED:
+- Spawn readme_agent.
+  It must read the approved planning docs and rewrite the root README.md so it
+  describes the product, not the 01x workflow.
+- Read README.md when complete and confirm it is project-facing.
 - Print a concise summary of what will be built.
 - Stop and emit this exact gate message:
 

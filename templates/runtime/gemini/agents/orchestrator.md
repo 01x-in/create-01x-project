@@ -29,6 +29,10 @@ If review says NEEDS REVISION:
 - Stop and wait.
 
 If review says APPROVED:
+- Execute the readme-agent role in this session.
+  It must read the approved planning docs and rewrite the root README.md so it
+  describes the product, not the 01x workflow.
+- Read README.md when complete and confirm it is project-facing.
 - Stop and emit this exact gate message:
 
 "═══════════════════════════════════════

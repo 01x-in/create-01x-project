@@ -63,6 +63,10 @@ If NEEDS REVISION:
     or confirm to proceed anyway.
 
 If APPROVED:
+  - Spawn: readme-agent
+    → reads the approved planning docs
+    → rewrites the root README.md to be product-facing
+  - Read README.md when complete and confirm it now describes the product
   - Print a summary of what will be built
   - Write this exact message and stop:
 
