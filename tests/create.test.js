@@ -1,5 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const { execSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -12,6 +13,7 @@ const {
   renderProjectReadme,
   resolveTargetDirectory,
   slugifyProjectName,
+  initialiseGit,
   writeScaffold,
 } = require('../lib/scaffold');
 
@@ -57,6 +59,19 @@ test('resolveTargetDirectory creates a new folder when the user declines the cur
   assert.equal(resolved.targetDir, path.join(cwd, 'perishnote'));
   assert.equal(resolved.targetDirectoryMode, 'custom');
   assert.equal(resolved.targetLabel, 'perishnote');
+});
+
+test('resolveTargetDirectory falls back to the suggested folder when folder name is missing', () => {
+  const cwd = '/tmp/scratch';
+  const resolved = resolveTargetDirectory({
+    cwd,
+    projectName: 'Perish Note',
+    useCurrentDirectory: false,
+    folderName: undefined,
+  });
+
+  assert.equal(resolved.targetDir, path.join(cwd, 'perish-note'));
+  assert.equal(resolved.targetLabel, 'perish-note');
 });
 
 test('getPlannedChanges shows create and overwrite paths for non-empty targets', () => {
@@ -108,6 +123,23 @@ test('writeScaffold writes Claude-only runtime files', () => {
   assert.match(readmeAgentTemplate, /Write the root `README\.md`/);
   assert.ok(!fs.existsSync(path.join(targetDir, 'AGENTS.md')));
   assert.ok(!fs.existsSync(path.join(targetDir, 'GEMINI.md')));
+});
+
+test('writeScaffold preserves an existing product seed on rerun', () => {
+  const targetDir = makeTempDir();
+  const seedPath = path.join(targetDir, '01x', 'product-seed.md');
+
+  fs.mkdirSync(path.dirname(seedPath), { recursive: true });
+  fs.writeFileSync(seedPath, '# Existing seed\n');
+
+  writeScaffold({
+    targetDir,
+    projectName: 'Perish Note',
+    runtime: 'claude',
+    targetDirectoryMode: 'current',
+  });
+
+  assert.equal(readFile(seedPath), '# Existing seed\n');
 });
 
 test('writeScaffold writes Codex-only runtime files with TOML agents', () => {
@@ -228,6 +260,33 @@ test('codex agent TOML preserves literal backslash sequences', () => {
   const escaped = _internal.escapeTomlMultiline('literal \\n path');
 
   assert.equal(escaped, 'literal \\\\n path');
+});
+
+test('codex agent TOML escapes four consecutive quotes safely', () => {
+  const escaped = _internal.escapeTomlMultiline('""""');
+
+  assert.equal(escaped, '\\"\\"\\""');
+});
+
+test('initialiseGit does not auto-commit inside a pre-existing git repository', () => {
+  const targetDir = makeTempDir();
+
+  execSync('git init', { cwd: targetDir, stdio: 'ignore' });
+
+  const result = initialiseGit({
+    targetDir,
+    preexistingEntries: [],
+  });
+
+  assert.equal(result.initialized, false);
+  assert.equal(result.committed, false);
+  assert.match(result.note, /Existing git repository detected/);
+});
+
+test('package test script is shell-glob safe on Windows', () => {
+  const packageJson = JSON.parse(readFile(path.join(__dirname, '..', 'package.json')));
+
+  assert.equal(packageJson.scripts.test, 'node --test "tests/*.test.js"');
 });
 
 test('runtime-aware doctor template checks codex and gemini outputs', () => {

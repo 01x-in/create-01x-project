@@ -19,7 +19,7 @@
   "author": "01x",
   "license": "MIT",
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "node --test \"tests/*.test.js\""
   },
   "dependencies": {
     "prompts": "^2.4.2",
