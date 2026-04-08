@@ -25,6 +25,9 @@ Read all four documents in this order:
 5. 01x/milestones.md        (delivery plan and story list)
 
 Read every document fully before writing anything.
+If `ctx_*` tools are available, use them to inspect the planning docs and
+cross-check large sections without dumping raw output into the main context.
+Fall back to standard Claude Code tools when context-mode is unavailable.
 
 ---
 
