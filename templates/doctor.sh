@@ -174,6 +174,13 @@ else
 fi
 
 echo ""
+if [ "${RUNTIME}" = "claude" ]; then
+  echo "Optional Context Efficiency:"
+  echo "  ⚠ context-mode is optional but recommended for long sessions,"
+  echo "    large logs, snapshots, and multi-file reads in Claude Code."
+  echo "    Docs: https://github.com/mksglu/context-mode"
+  echo ""
+fi
 
 if [ "${PREFLIGHT_FAILED}" -eq 0 ]; then
   echo "  ✅ All checks passed. Ready to build."

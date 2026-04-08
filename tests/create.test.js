@@ -176,14 +176,19 @@ test('generated README stays project-facing and points workflow docs to HOWTO', 
 });
 
 test('generated HOWTO includes runtime-specific next steps', () => {
+  const claudeHowto = renderHowto('Perish Note', 'claude');
   const codexHowto = renderHowto('Perish Note', 'codex');
   const geminiHowto = renderHowto('Perish Note', 'gemini');
 
+  assert.match(claudeHowto, /context-mode/i);
+  assert.match(claudeHowto, /\/context-mode:ctx-doctor/);
   assert.match(codexHowto, /Open Codex CLI in this folder and type:/);
   assert.match(codexHowto, /refreshes `README\.md`/);
   assert.match(codexHowto, /\| readme-agent \| post-review \| Rewrites the root README\.md/);
   assert.match(codexHowto, /Spawn the orchestrator agent and let it coordinate the workflow\./);
+  assert.doesNotMatch(codexHowto, /context-mode/i);
   assert.match(geminiHowto, /Open Gemini CLI in this folder and run:/);
+  assert.doesNotMatch(geminiHowto, /context-mode/i);
   assert.match(geminiHowto, /\/01x:orchestrator/);
 });
 
@@ -192,6 +197,31 @@ test('shared agent templates are runtime-neutral prompt sources', () => {
 
   assert.doesNotMatch(sharedOrchestrator, /^model:/m);
   assert.doesNotMatch(sharedOrchestrator, /^tools:/m);
+});
+
+test('context-mode hint is injected only for Claude long-read agents', () => {
+  const targetDir = makeTempDir();
+
+  writeScaffold({
+    targetDir,
+    projectName: 'Perish Note',
+    runtime: 'claude',
+    targetDirectoryMode: 'current',
+  });
+
+  const claudeBuildAgent = readFile(path.join(targetDir, '.claude', 'agents', 'build-agent.md'));
+
+  writeScaffold({
+    targetDir,
+    projectName: 'Perish Note',
+    runtime: 'codex',
+    targetDirectoryMode: 'current',
+  });
+
+  const codexBuildAgent = readFile(path.join(targetDir, '.codex', 'agents', 'build_agent.toml'));
+
+  assert.match(claudeBuildAgent, /context-mode is installed in Claude Code/i);
+  assert.doesNotMatch(codexBuildAgent, /context-mode/i);
 });
 
 test('codex agent TOML preserves literal backslash sequences', () => {
@@ -208,4 +238,5 @@ test('runtime-aware doctor template checks codex and gemini outputs', () => {
   assert.match(doctorTemplate, /\.gemini\/commands\/01x/);
   assert.match(doctorTemplate, /codex CLI: installed/);
   assert.match(doctorTemplate, /gemini CLI: installed/);
+  assert.match(doctorTemplate, /\[ "\$\{RUNTIME\}" = "claude" \]/);
 });

@@ -172,6 +172,8 @@ Write `01x/product-seed.md`. This is the only file you author manually before th
 The generated root `README.md` starts as a stub and is then rewritten by `readme-agent`
 from the approved planning docs so it describes the product.
 The operational instructions live in `01x/HOWTO.md`.
+For long sessions and bulky reads/logs in Claude Code, the generated workflow also includes
+optional `context-mode` guidance: [mksglu/context-mode](https://github.com/mksglu/context-mode).
 
 ### 3. Run the orchestrator
 
